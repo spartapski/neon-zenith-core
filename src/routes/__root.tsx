@@ -77,14 +77,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "DODRICOM — Domotique, Digital, Réseaux, IA, Communication, Events" },
+      {
+        name: "description",
+        content:
+          "DODRICOM — Agence premium spécialisée en Domotique, Digital, Réseaux, Intelligence Artificielle, Communication et Événementiel. L'innovation au service de votre performance.",
+      },
+      { name: "author", content: "DODRICOM" },
+      { property: "og:title", content: "DODRICOM — L'innovation au service de votre performance" },
+      {
+        property: "og:description",
+        content:
+          "Solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "DODRICOM — L'innovation au service de votre performance" },
     ],
     links: [
       {
@@ -92,6 +100,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
