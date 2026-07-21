@@ -77,22 +77,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DODRICOM — Domotique, Digital, Réseaux, IA, Communication, Events" },
+      { title: "DODRICOM — L'innovation au service de votre performance" },
       {
         name: "description",
         content:
-          "DODRICOM — Agence premium spécialisée en Domotique, Digital, Réseaux, Intelligence Artificielle, Communication et Événementiel. L'innovation au service de votre performance.",
+          "Solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel. DODRICOM accompagne votre croissance.",
       },
       { name: "author", content: "DODRICOM" },
       { property: "og:title", content: "DODRICOM — L'innovation au service de votre performance" },
       {
         property: "og:description",
         content:
-          "Solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel.",
+          "Solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel. DODRICOM accompagne votre croissance.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "DODRICOM — L'innovation au service de votre performance" },
+      { name: "twitter:description", content: "Solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel. DODRICOM accompagne votre croissance." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/286dfcbf-7f76-4377-ad4c-39901a847fb7/id-preview-219103e6--9dbc2867-8560-4eb2-8097-0acc0955c126.lovable.app-1784593791234.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/286dfcbf-7f76-4377-ad4c-39901a847fb7/id-preview-219103e6--9dbc2867-8560-4eb2-8097-0acc0955c126.lovable.app-1784593791234.png" },
     ],
     links: [
       {
