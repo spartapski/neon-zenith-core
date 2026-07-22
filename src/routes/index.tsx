@@ -1,19 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Play, Cpu, Home, Network, BrainCircuit, Megaphone, Calendar, Users, Briefcase, Award, Headphones, Sparkles } from "lucide-react";
+import { ArrowRight, Cpu, Home, Network, BrainCircuit, Megaphone, Calendar, Users, Briefcase, Award, Headphones } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import heroBuilding from "@/assets/hero-building.jpg";
+import { CinematicHero } from "@/components/site/CinematicHero";
 import aboutReception from "@/assets/about-reception.jpg";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
   head: () => ({
     meta: [
-      { title: "DODRICOM — L'innovation au service de votre performance" },
+      { title: "DODRICOM — Entrez dans le siège de l'innovation" },
       {
         name: "description",
         content:
-          "Solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel. DODRICOM accompagne votre croissance.",
+          "Vivez une expérience cinématique : entrez dans le siège DODRICOM et découvrez nos solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel.",
       },
+      { property: "og:title", content: "DODRICOM — Entrez dans le siège de l'innovation" },
+      { property: "og:description", content: "Expérience cinématique DODRICOM : domotique, digital, réseaux, IA, communication et événementiel." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });
@@ -37,68 +41,20 @@ const STATS = [
 function HomePage() {
   return (
     <SiteLayout>
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src={heroBuilding}
-            alt="Bâtiment DODRICOM la nuit avec logo lumineux"
-            width={1920}
-            height={1080}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#05060A] via-[#05060A]/85 to-[#05060A]/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#05060A] via-transparent to-transparent" />
-        </div>
+      {/* Cinematic scroll-driven hero: exterior → doors → reception */}
+      <CinematicHero />
 
-        <div className="relative mx-auto grid min-h-[92vh] max-w-7xl grid-cols-1 items-center px-5 py-24 lg:grid-cols-12 lg:px-8">
-          <div className="lg:col-span-7 animate-fade-up">
-            <p className="mb-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
-              <Sparkles className="h-4 w-4" />
-              L'innovation au service de
-            </p>
-            <h1 className="text-5xl font-black leading-[0.95] text-white sm:text-7xl lg:text-[7.5rem]">
-              VOTRE
-              <br />
-              <span className="gradient-text">PERFORMANCE</span>
-            </h1>
-            <p className="mt-8 max-w-xl text-lg text-white/80">
-              Des solutions intelligentes en Domotique, Digital, Réseaux, IA, Communication
-              et Événementiel pour accompagner votre croissance.
-            </p>
-
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link
-                to="/services"
-                className="btn-gradient inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold"
-              >
-                Découvrir nos services <ArrowRight className="h-4 w-4" />
-              </Link>
-              <button className="btn-ghost-glow inline-flex items-center gap-3 rounded-full px-6 py-3 text-sm font-semibold">
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-white/10">
-                  <Play className="h-4 w-4" />
-                </span>
-                Voir notre vidéo
-              </button>
+      {/* STATS strip */}
+      <section className="relative mx-auto max-w-7xl px-5 py-16 lg:px-8">
+        <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+          {STATS.map(({ icon: Icon, value, label }) => (
+            <div key={label} className="glass p-6">
+              <Icon className="mb-3 h-6 w-6 text-[color:var(--brand-violet)]" />
+              <dt className="text-3xl font-black text-white">{value}</dt>
+              <dd className="mt-1 text-xs text-[color:var(--brand-text-muted)]">{label}</dd>
             </div>
-
-            <dl className="mt-16 grid grid-cols-2 gap-6 sm:grid-cols-4">
-              {STATS.map(({ icon: Icon, value, label }) => (
-                <div key={label} className="min-w-0">
-                  <Icon className="mb-3 h-6 w-6 text-[color:var(--brand-violet)]" />
-                  <dt className="text-3xl font-black text-white">{value}</dt>
-                  <dd className="mt-1 text-xs text-[color:var(--brand-text-muted)]">{label}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-
-        <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
-          <span className="text-[10px] font-medium uppercase tracking-[0.35em] text-white/50">
-            Scroll pour découvrir
-          </span>
-        </div>
+          ))}
+        </dl>
       </section>
 
       {/* SERVICES GRID */}
