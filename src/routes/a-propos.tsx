@@ -38,6 +38,8 @@ function AboutPage() {
           </>
         }
         subtitle="DODRICOM est une entreprise innovante spécialisée dans la Domotique, le Digital, les Réseaux, l'Intelligence Artificielle, la Communication et l'Événementiel."
+        bgImage={aboutReception}
+        bgAlt="Réception du siège DODRICOM"
       />
 
       <section className="relative mx-auto max-w-7xl px-5 pb-8 lg:px-8">
