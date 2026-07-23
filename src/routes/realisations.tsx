@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
+import heroPortfolio from "@/assets/hero-portfolio.jpg";
 import imgDomo from "@/assets/service-domotique.jpg";
 import imgDigital from "@/assets/service-digital.jpg";
 import imgReseaux from "@/assets/service-reseaux.jpg";
@@ -42,6 +43,8 @@ function RealisationsPage() {
         eyebrow="Nos réalisations"
         title={<>RÉALISATIONS <span className="gradient-text">Premium</span></>}
         subtitle="Découvrez une sélection de projets sur mesure, innovants et efficaces réalisés pour nos clients."
+        bgImage={heroPortfolio}
+        bgAlt="Portfolio DODRICOM — mur de projets illuminé"
       />
 
       <section className="mx-auto max-w-7xl px-5 lg:px-8">
