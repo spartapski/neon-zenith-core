@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight, LogIn, Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
+import { LoginModal } from "./LoginModal";
+import { useAuth } from "@/lib/auth";
 
 const NAV = [
   { to: "/", label: "Accueil" },
@@ -16,6 +18,8 @@ const NAV = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -61,7 +65,26 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="hidden lg:block">
+        <div className="hidden items-center gap-2 lg:flex">
+          {user ? (
+            <Link
+              to="/admin"
+              className="group relative inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white backdrop-blur-xl transition hover:border-[color:var(--brand-violet)]/60 hover:shadow-[0_0_25px_rgba(139,61,255,0.4)]"
+            >
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-[var(--gradient-brand)] text-[10px] font-black text-white">
+                {user.username.slice(0, 1)}
+              </span>
+              Back Office
+            </Link>
+          ) : (
+            <button
+              onClick={() => setLoginOpen(true)}
+              className="group relative inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white backdrop-blur-xl transition hover:border-[color:var(--brand-violet)]/60 hover:shadow-[0_0_25px_rgba(139,61,255,0.4)]"
+            >
+              <LogIn className="h-4 w-4 opacity-80 transition group-hover:opacity-100" />
+              Connexion
+            </button>
+          )}
           <Link
             to="/contact"
             className="btn-gradient inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
@@ -105,9 +128,31 @@ export function Navbar() {
                 Demander un devis <ArrowRight className="h-4 w-4" />
               </Link>
             </li>
+            <li>
+              {user ? (
+                <Link
+                  to="/admin"
+                  onClick={() => setOpen(false)}
+                  className="btn-ghost-glow flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
+                >
+                  Ouvrir le Back Office
+                </Link>
+              ) : (
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    setLoginOpen(true);
+                  }}
+                  className="btn-ghost-glow flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
+                >
+                  <LogIn className="h-4 w-4" /> Connexion
+                </button>
+              )}
+            </li>
           </ul>
         </div>
       )}
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </header>
   );
 }
