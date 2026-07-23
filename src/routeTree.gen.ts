@@ -15,8 +15,18 @@ import { Route as SaasRouteImport } from './routes/saas'
 import { Route as RealisationsRouteImport } from './routes/realisations'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminSaasRouteImport } from './routes/admin.saas'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
+import { Route as AdminCrmRouteImport } from './routes/admin.crm'
+import { Route as AdminCmsRouteImport } from './routes/admin.cms'
+import { Route as AdminBillingRouteImport } from './routes/admin.billing'
+import { Route as AdminAdministrationRouteImport } from './routes/admin.administration'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -48,6 +58,11 @@ const BlogRoute = BlogRouteImport.update({
   path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AProposRoute = AProposRouteImport.update({
   id: '/a-propos',
   path: '/a-propos',
@@ -58,16 +73,71 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSaasRoute = AdminSaasRouteImport.update({
+  id: '/saas',
+  path: '/saas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFinanceRoute = AdminFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCrmRoute = AdminCrmRouteImport.update({
+  id: '/crm',
+  path: '/crm',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCmsRoute = AdminCmsRouteImport.update({
+  id: '/cms',
+  path: '/cms',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBillingRoute = AdminBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdministrationRoute = AdminAdministrationRouteImport.update({
+  id: '/administration',
+  path: '/administration',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
+  '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/realisations': typeof RealisationsRoute
   '/saas': typeof SaasRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/administration': typeof AdminAdministrationRoute
+  '/admin/billing': typeof AdminBillingRoute
+  '/admin/cms': typeof AdminCmsRoute
+  '/admin/crm': typeof AdminCrmRoute
+  '/admin/finance': typeof AdminFinanceRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/saas': typeof AdminSaasRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,29 +148,58 @@ export interface FileRoutesByTo {
   '/saas': typeof SaasRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/administration': typeof AdminAdministrationRoute
+  '/admin/billing': typeof AdminBillingRoute
+  '/admin/cms': typeof AdminCmsRoute
+  '/admin/crm': typeof AdminCrmRoute
+  '/admin/finance': typeof AdminFinanceRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/saas': typeof AdminSaasRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
+  '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/realisations': typeof RealisationsRoute
   '/saas': typeof SaasRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/administration': typeof AdminAdministrationRoute
+  '/admin/billing': typeof AdminBillingRoute
+  '/admin/cms': typeof AdminCmsRoute
+  '/admin/crm': typeof AdminCrmRoute
+  '/admin/finance': typeof AdminFinanceRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/saas': typeof AdminSaasRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/a-propos'
+    | '/admin'
     | '/blog'
     | '/contact'
     | '/realisations'
     | '/saas'
     | '/services'
     | '/sitemap.xml'
+    | '/admin/administration'
+    | '/admin/billing'
+    | '/admin/cms'
+    | '/admin/crm'
+    | '/admin/finance'
+    | '/admin/messages'
+    | '/admin/saas'
+    | '/admin/settings'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,21 +210,41 @@ export interface FileRouteTypes {
     | '/saas'
     | '/services'
     | '/sitemap.xml'
+    | '/admin/administration'
+    | '/admin/billing'
+    | '/admin/cms'
+    | '/admin/crm'
+    | '/admin/finance'
+    | '/admin/messages'
+    | '/admin/saas'
+    | '/admin/settings'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/a-propos'
+    | '/admin'
     | '/blog'
     | '/contact'
     | '/realisations'
     | '/saas'
     | '/services'
     | '/sitemap.xml'
+    | '/admin/administration'
+    | '/admin/billing'
+    | '/admin/cms'
+    | '/admin/crm'
+    | '/admin/finance'
+    | '/admin/messages'
+    | '/admin/saas'
+    | '/admin/settings'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AProposRoute: typeof AProposRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   RealisationsRoute: typeof RealisationsRoute
@@ -178,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/a-propos': {
       id: '/a-propos'
       path: '/a-propos'
@@ -192,12 +318,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/saas': {
+      id: '/admin/saas'
+      path: '/saas'
+      fullPath: '/admin/saas'
+      preLoaderRoute: typeof AdminSaasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/finance': {
+      id: '/admin/finance'
+      path: '/finance'
+      fullPath: '/admin/finance'
+      preLoaderRoute: typeof AdminFinanceRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/crm': {
+      id: '/admin/crm'
+      path: '/crm'
+      fullPath: '/admin/crm'
+      preLoaderRoute: typeof AdminCrmRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/cms': {
+      id: '/admin/cms'
+      path: '/cms'
+      fullPath: '/admin/cms'
+      preLoaderRoute: typeof AdminCmsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/billing': {
+      id: '/admin/billing'
+      path: '/billing'
+      fullPath: '/admin/billing'
+      preLoaderRoute: typeof AdminBillingRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/administration': {
+      id: '/admin/administration'
+      path: '/administration'
+      fullPath: '/admin/administration'
+      preLoaderRoute: typeof AdminAdministrationRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminAdministrationRoute: typeof AdminAdministrationRoute
+  AdminBillingRoute: typeof AdminBillingRoute
+  AdminCmsRoute: typeof AdminCmsRoute
+  AdminCrmRoute: typeof AdminCrmRoute
+  AdminFinanceRoute: typeof AdminFinanceRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminSaasRoute: typeof AdminSaasRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdministrationRoute: AdminAdministrationRoute,
+  AdminBillingRoute: AdminBillingRoute,
+  AdminCmsRoute: AdminCmsRoute,
+  AdminCrmRoute: AdminCrmRoute,
+  AdminFinanceRoute: AdminFinanceRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
+  AdminSaasRoute: AdminSaasRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AProposRoute: AProposRoute,
+  AdminRoute: AdminRouteWithChildren,
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   RealisationsRoute: RealisationsRoute,
