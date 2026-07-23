@@ -159,6 +159,8 @@ function ServicesPage() {
           </>
         }
         subtitle="Sélectionnez une catégorie et découvrez nos produits, nos packs et nos garanties."
+        bgImage={imgDomo}
+        bgAlt="Salon domotique nocturne DODRICOM"
       />
 
       {/* Category tabs */}

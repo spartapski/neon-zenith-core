@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Mail, MapPin, Phone, Clock, Facebook, Instagram, Linkedin, Youtube, ArrowRight, Check } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
+import heroContact from "@/assets/hero-contact.jpg";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
@@ -22,6 +23,8 @@ function ContactPage() {
         eyebrow="Contact"
         title={<>Parlons de votre <span className="gradient-text">projet</span>.</>}
         subtitle="Notre équipe vous répond sous 24 h avec un devis clair et détaillé."
+        bgImage={heroContact}
+        bgAlt="Hub de communication DODRICOM néon"
       />
 
       <section className="mx-auto max-w-7xl px-5 pb-16 lg:px-8">

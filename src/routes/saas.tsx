@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, ArrowRight, Users, FileText, ShoppingCart, KanbanSquare, LifeBuoy, Building2 } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
+import heroSaas from "@/assets/hero-saas.jpg";
 
 export const Route = createFileRoute("/saas")({
   component: SaasPage,
@@ -34,6 +35,8 @@ function SaasPage() {
         eyebrow="Solutions SaaS"
         title={<>Vos outils métiers <span className="gradient-text">dans le cloud</span>.</>}
         subtitle="Une suite d'applications SaaS pensée pour piloter votre activité, sans installation ni maintenance."
+        bgImage={heroSaas}
+        bgAlt="Espace de travail cloud SaaS DODRICOM"
       />
 
       <section className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
