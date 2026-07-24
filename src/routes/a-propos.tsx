@@ -1,6 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Target, Shield, Users, Headphones, Lightbulb, ShieldCheck, Handshake, BarChart3, Briefcase, Award } from "lucide-react";
-import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
+import {
+  Award,
+  BarChart3,
+  Briefcase,
+  ChevronDown,
+  Handshake,
+  Headphones,
+  Lightbulb,
+  Shield,
+  ShieldCheck,
+  Target,
+  Users,
+} from "lucide-react";
+import { SiteLayout } from "@/components/site/SiteLayout";
 import aboutReception from "@/assets/about-reception.jpg";
 
 export const Route = createFileRoute("/a-propos")({
@@ -30,101 +42,100 @@ const STATS = [
 function AboutPage() {
   return (
     <SiteLayout>
-      <PageHeader
-        eyebrow="À propos de DODRICOM"
-        title={
-          <>
-            Présentation <span className="gradient-text">Commerciale</span>
-          </>
-        }
-        subtitle="DODRICOM est une entreprise innovante spécialisée dans la Domotique, le Digital, les Réseaux, l'Intelligence Artificielle, la Communication et l'Événementiel."
-        bgImage={aboutReception}
-        bgAlt="Réception du siège DODRICOM"
-      />
+      {/* HERO — reception background with intro + bullets */}
+      <section className="relative -mt-[78px] min-h-screen overflow-hidden lg:-mt-[90px]">
+        <img
+          src={aboutReception}
+          alt="Réception du siège DODRICOM"
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#05060A] via-[#05060A]/85 to-[#05060A]/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#05060A] via-transparent to-[#05060A]/40" />
 
-      <section className="relative mx-auto max-w-7xl px-5 pb-8 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10">
-            <img
-              src={aboutReception}
-              alt="Réception DODRICOM"
-              width={1600}
-              height={1000}
-              loading="lazy"
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <ul className="grid content-center gap-4">
+        <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-5 pb-48 pt-32 lg:px-8">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] gradient-text">
+            À propos de DODRICOM
+          </p>
+          <h1 className="text-5xl font-black leading-[0.95] text-white sm:text-6xl">
+            Présentation
+            <br />
+            <span className="gradient-text">Commerciale</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-white/75">
+            DODRICOM est une entreprise innovante spécialisée dans la Domotique,
+            le Digital, les Réseaux, l'Intelligence Artificielle, la Communication
+            et l'Événementiel.
+          </p>
+          <ul className="mt-8 grid max-w-xl gap-4">
             {[
               { icon: Target, text: "Des solutions sur mesure adaptées à vos besoins" },
               { icon: Shield, text: "Une approche centrée sur la qualité et la performance" },
               { icon: Users, text: "Un accompagnement de A à Z" },
               { icon: Headphones, text: "Une équipe d'experts passionnés à votre service" },
             ].map(({ icon: Icon, text }) => (
-              <li key={text} className="glass flex items-center gap-4 p-5">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--gradient-primary)] shadow-[0_0_20px_rgba(139,61,255,0.4)]">
-                  <Icon className="h-5 w-5 text-white" />
+              <li key={text} className="flex items-center gap-3">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[color:var(--brand-violet)]/40 bg-[color:var(--brand-violet)]/10">
+                  <Icon className="h-4 w-4 text-[color:var(--brand-violet)]" />
                 </span>
-                <span className="text-white/85">{text}</span>
+                <span className="text-sm text-white/85">{text}</span>
               </li>
             ))}
           </ul>
-        </div>
-      </section>
 
-      <section className="relative mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-3">
-          <article className="glass p-8">
-            <h3 className="text-2xl font-black gradient-text">Notre mission</h3>
-            <p className="mt-4 text-white/75">
-              Accompagner nos clients avec des solutions intelligentes, fiables et évolutives
-              pour relever les défis d'aujourd'hui et de demain.
-            </p>
-          </article>
-          <article className="glass p-8">
-            <h3 className="text-2xl font-black gradient-text">Notre vision</h3>
-            <p className="mt-4 text-white/75">
-              Devenir un acteur de référence grâce à l'innovation, la confiance et l'excellence
-              opérationnelle.
-            </p>
-          </article>
-          <article className="glass p-8">
-            <h3 className="text-2xl font-black gradient-text">Notre promesse</h3>
-            <p className="mt-4 text-white/75">
-              Un partenaire technologique unique, transparent, réactif et engagé sur la
-              performance mesurable de chaque projet.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section className="relative mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <p className="mb-8 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
-          DODRICOM en chiffres
-        </p>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {STATS.map(({ icon: Icon, value, label }) => (
-            <div key={label} className="glass flex flex-col items-center p-8 text-center">
-              <Icon className="mb-4 h-8 w-8 text-[color:var(--brand-violet)]" />
-              <div className="text-4xl font-black text-white">{value}</div>
-              <div className="mt-2 text-sm text-white/70">{label}</div>
+          {/* Bottom trio */}
+          <div className="mt-14 grid gap-4 lg:grid-cols-3">
+            <div className="glass p-6">
+              <h3 className="text-lg font-bold gradient-text">Notre mission</h3>
+              <p className="mt-2 text-sm text-white/75">
+                Accompagner nos clients avec des solutions intelligentes, fiables
+                et évolutives pour relever les défis d'aujourd'hui et de demain.
+              </p>
+              <div className="my-4 h-px bg-white/10" />
+              <h3 className="text-lg font-bold gradient-text">Notre vision</h3>
+              <p className="mt-2 text-sm text-white/75">
+                Devenir un acteur de référence grâce à l'innovation, la confiance
+                et l'excellence opérationnelle.
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
 
-      <section className="relative mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <p className="mb-8 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">Nos valeurs</p>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {VALUES.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="glass card-hover p-7">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--gradient-primary)] shadow-[0_0_20px_rgba(139,61,255,0.4)]">
-                <Icon className="h-5 w-5 text-white" />
-              </span>
-              <h4 className="mt-5 text-lg font-bold text-white">{title}</h4>
-              <p className="mt-2 text-sm text-white/70">{desc}</p>
+            <div className="glass p-6">
+              <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.3em] gradient-text">
+                DODRICOM en chiffres
+              </p>
+              <div className="grid grid-cols-2 gap-5">
+                {STATS.map(({ icon: Icon, value, label }) => (
+                  <div key={label}>
+                    <Icon className="mb-2 h-5 w-5 text-[color:var(--brand-violet)]" />
+                    <div className="text-2xl font-black text-white">{value}</div>
+                    <div className="text-[11px] text-white/60">{label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+
+            <div className="glass p-6">
+              <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.3em] gradient-text">
+                Nos valeurs
+              </p>
+              <ul className="space-y-4">
+                {VALUES.map(({ icon: Icon, title, desc }) => (
+                  <li key={title} className="flex items-start gap-3">
+                    <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--brand-violet)]" />
+                    <div>
+                      <div className="text-sm font-semibold text-white">{title}</div>
+                      <div className="text-xs text-white/60">{desc}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-center text-white/60">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.35em]">Scroller</p>
+          <ChevronDown className="mx-auto mt-2 h-5 w-5 animate-bounce" />
         </div>
       </section>
     </SiteLayout>
