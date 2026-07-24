@@ -1,7 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { Home, Cpu, Network, BrainCircuit, Megaphone, Calendar, Check, ArrowRight, Rocket, Shield, Zap, Leaf } from "lucide-react";
-import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
+import { useRef, useState } from "react";
+import {
+  ArrowRight,
+  BrainCircuit,
+  Calendar,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Cpu,
+  Home,
+  Leaf,
+  Megaphone,
+  Network,
+  Rocket,
+  Shield,
+  Zap,
+} from "lucide-react";
+import { SiteLayout } from "@/components/site/SiteLayout";
 import imgDomo from "@/assets/service-domotique.jpg";
 import imgDigital from "@/assets/service-digital.jpg";
 import imgReseaux from "@/assets/service-reseaux.jpg";
@@ -148,126 +164,192 @@ function ServicesPage() {
   const [active, setActive] = useState(CATEGORIES[0].key);
   const category = CATEGORIES.find((c) => c.key === active)!;
   const Icon = category.icon;
+  const scroller = useRef<HTMLDivElement>(null);
+  const scrollBy = (dir: 1 | -1) => {
+    scroller.current?.scrollBy({ left: dir * 320, behavior: "smooth" });
+  };
 
   return (
     <SiteLayout>
-      <PageHeader
-        eyebrow="Nos services"
-        title={
-          <>
-            Un écosystème <span className="gradient-text">complet</span> pour votre croissance.
-          </>
-        }
-        subtitle="Sélectionnez une catégorie et découvrez nos produits, nos packs et nos garanties."
-        bgImage={imgDomo}
-        bgAlt="Salon domotique nocturne DODRICOM"
-      />
+      {/* HERO WITH TABS — image right, title & tabs left */}
+      <section key={category.key} className="relative -mt-[78px] overflow-hidden pb-14 lg:-mt-[90px]">
+        <img
+          src={category.image}
+          alt={category.title}
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#05060A] via-[#05060A]/85 to-[#05060A]/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#05060A] via-transparent to-transparent" />
 
-      {/* Category tabs */}
-      <section className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="glass-strong flex flex-wrap items-center justify-center gap-2 p-3">
-          {CATEGORIES.map((c) => {
-            const CIcon = c.icon;
-            const isActive = c.key === active;
-            return (
-              <button
-                key={c.key}
-                onClick={() => setActive(c.key)}
-                className={`group relative flex flex-1 min-w-[110px] flex-col items-center gap-2 rounded-2xl px-4 py-4 text-xs font-semibold uppercase tracking-wider transition-all ${
-                  isActive ? "bg-white/5 text-white" : "text-white/60 hover:text-white"
-                }`}
-              >
-                <span className={`grid h-10 w-10 place-items-center rounded-xl border ${isActive ? "border-[color:var(--brand-violet)] bg-[var(--gradient-primary)] text-white shadow-[0_0_20px_rgba(139,61,255,0.6)]" : "border-white/10 bg-white/5"}`}>
-                  <CIcon className="h-5 w-5" />
-                </span>
-                {c.label}
-                {isActive && (
-                  <span className="absolute -bottom-0.5 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-[var(--gradient-primary)] shadow-[0_0_10px_rgba(139,61,255,0.9)]" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </section>
+        <div className="relative mx-auto max-w-7xl px-5 pt-32 lg:px-8 lg:pt-40">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,340px)_1fr] lg:items-start">
+            {/* Left column: eyebrow + title + intro */}
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] gradient-text">
+                Nos services
+              </p>
+              <h1 className="text-5xl font-black leading-none text-white sm:text-6xl">
+                {category.title}
+              </h1>
+              <p className="mt-5 max-w-sm text-sm text-white/75">{category.intro}</p>
+            </div>
 
-      {/* Category hero */}
-      <section className="relative mx-auto mt-12 max-w-7xl overflow-hidden rounded-3xl border border-white/10 px-0 lg:mx-auto lg:max-w-7xl">
-        <div className="mx-5 overflow-hidden rounded-3xl lg:mx-8">
-          <div className="relative min-h-[380px]">
-            <img src={category.image} alt={category.title} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#05060A] via-[#05060A]/80 to-transparent" />
-            <div className="relative flex h-full min-h-[380px] flex-col justify-center p-8 lg:p-14">
-              <div className="mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-[var(--gradient-primary)] shadow-[0_0_30px_rgba(139,61,255,0.5)]">
-                <Icon className="h-6 w-6 text-white" />
-              </div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] gradient-text">Nos services</p>
-              <h2 className="mt-2 text-4xl font-black text-white sm:text-5xl lg:text-6xl">{category.title}</h2>
-              <p className="mt-4 max-w-xl text-white/80">{category.intro}</p>
+            {/* Category tabs bar */}
+            <div className="glass-strong flex items-center justify-between gap-1 rounded-3xl p-2">
+              {CATEGORIES.map((c) => {
+                const CIcon = c.icon;
+                const isActive = c.key === active;
+                return (
+                  <button
+                    key={c.key}
+                    onClick={() => setActive(c.key)}
+                    className={`group relative flex flex-1 flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[10px] font-bold uppercase tracking-wider transition ${
+                      isActive ? "text-white" : "text-white/55 hover:text-white/85"
+                    }`}
+                  >
+                    <CIcon
+                      className={`h-6 w-6 ${
+                        isActive
+                          ? "text-[color:var(--brand-violet)] drop-shadow-[0_0_10px_rgba(139,61,255,0.9)]"
+                          : ""
+                      }`}
+                    />
+                    <span>{c.label}</span>
+                    {isActive && (
+                      <span className="mt-1 h-0.5 w-6 rounded-full bg-[var(--gradient-primary)] shadow-[0_0_10px_rgba(139,61,255,0.9)]" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Products */}
-      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <p className="mb-8 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">Les produits</p>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {/* PRODUCTS — horizontal scroller */}
+      <section className="relative mx-auto max-w-7xl px-5 pb-10 lg:px-8">
+        <div className="mb-5 flex items-end justify-between">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
+            Les produits
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => scrollBy(-1)}
+              aria-label="Précédent"
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/[0.04] text-white/80 backdrop-blur-xl transition hover:border-[color:var(--brand-violet)]/60 hover:text-white"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => scrollBy(1)}
+              aria-label="Suivant"
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/[0.04] text-white/80 backdrop-blur-xl transition hover:border-[color:var(--brand-violet)]/60 hover:text-white"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <div
+          ref={scroller}
+          className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {category.products.map((p) => (
-            <div key={p.name} className="glass card-hover p-6">
-              <h3 className="text-lg font-bold text-white">{p.name}</h3>
-              <p className="mt-2 text-sm text-white/70">{p.desc}</p>
-              <p className="mt-5 text-2xl font-black gradient-text">{p.price}</p>
+            <div
+              key={p.name}
+              className="glass card-hover w-[260px] shrink-0 snap-start p-6"
+            >
+              <div className="mb-5 grid h-14 w-14 place-items-center rounded-2xl border border-[color:var(--brand-violet)]/40 bg-[color:var(--brand-violet)]/10">
+                <Icon className="h-6 w-6 text-[color:var(--brand-violet)]" />
+              </div>
+              <h3 className="text-base font-bold text-white">{p.name}</h3>
+              <p className="mt-2 text-xs leading-relaxed text-white/65">{p.desc}</p>
+              <p className="mt-5 text-xl font-black gradient-text">{p.price}</p>
             </div>
           ))}
         </div>
+        <div className="mt-3 flex items-center justify-between text-[11px] text-white/40">
+          <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
+            <div className="h-full w-1/2 rounded-full bg-[var(--gradient-primary)]" />
+          </div>
+          <span className="ml-4">{category.products.length} / {category.products.length}</span>
+        </div>
       </section>
 
-      {/* Packs */}
-      <section className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
-        <p className="mb-8 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">Nos packs</p>
-        <div className="grid gap-5 lg:grid-cols-3">
+      {/* PACKS + BENEFITS side-by-side (3 packs + benefits sidebar) */}
+      <section className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
+        <p className="mb-6 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
+          Nos packs {category.label.toLowerCase()}
+        </p>
+        <div className="grid gap-5 lg:grid-cols-4">
           {category.packs.map((pack) => (
-            <div key={pack.name} className={`glass relative p-8 ${pack.popular ? "border-[color:var(--brand-violet)]/60 shadow-[0_0_40px_rgba(139,61,255,0.35)]" : ""}`}>
+            <div
+              key={pack.name}
+              className={`glass relative p-6 ${
+                pack.popular
+                  ? "border-[color:var(--brand-violet)]/60 shadow-[0_0_40px_rgba(139,61,255,0.35)]"
+                  : ""
+              }`}
+            >
               {pack.popular && (
-                <span className="absolute right-6 top-6 rounded-full bg-[var(--gradient-primary)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                <span className="absolute right-4 top-4 rounded-full bg-[var(--gradient-primary)] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
                   Populaire
                 </span>
               )}
-              <h3 className="text-lg font-bold text-white">{pack.name}</h3>
-              <div className="mt-3 flex items-baseline gap-3">
-                <span className="text-3xl font-black gradient-text">{pack.price}</span>
-                {pack.oldPrice && <span className="text-sm text-white/40 line-through">{pack.oldPrice}</span>}
+              <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-[var(--gradient-primary)] shadow-[0_0_20px_rgba(139,61,255,0.4)]">
+                <Icon className="h-5 w-5 text-white" />
               </div>
-              <ul className="mt-6 space-y-2.5 text-sm text-white/80">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+                {pack.name}
+              </h3>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-2xl font-black gradient-text">{pack.price}</span>
+                {pack.oldPrice && (
+                  <span className="text-xs text-white/40 line-through">
+                    {pack.oldPrice}
+                  </span>
+                )}
+              </div>
+              <ul className="mt-5 space-y-2 text-xs text-white/80">
                 {pack.features.map((f) => (
                   <li key={f} className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--brand-violet)]" />
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--brand-violet)]" />
                     {f}
                   </li>
                 ))}
               </ul>
-              <Link to="/contact" className="btn-gradient mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold">
-                Choisir ce pack <ArrowRight className="h-4 w-4" />
+              <Link
+                to="/contact"
+                className="btn-gradient mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold"
+              >
+                Choisir ce pack <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           ))}
-        </div>
-      </section>
 
-      {/* Benefits */}
-      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {BENEFITS.map(({ icon: BIcon, title, desc }) => (
-            <div key={title} className="glass flex items-start gap-4 p-6">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[var(--gradient-primary)] shadow-[0_0_20px_rgba(139,61,255,0.4)]">
-                <BIcon className="h-5 w-5 text-white" />
-              </span>
-              <div className="min-w-0">
-                <h4 className="font-bold text-white">{title}</h4>
-                <p className="text-sm text-white/70">{desc}</p>
-              </div>
-            </div>
-          ))}
+          {/* Benefits sidebar (4th column) */}
+          <div className="glass p-6">
+            <ul className="space-y-5">
+              {BENEFITS.map(({ icon: BIcon, title, desc }) => (
+                <li key={title} className="flex items-start gap-3">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[color:var(--brand-violet)]/40 bg-[color:var(--brand-violet)]/10">
+                    <BIcon className="h-4 w-4 text-[color:var(--brand-violet)]" />
+                  </span>
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-semibold text-white">{title}</h4>
+                    <p className="text-xs text-white/60">{desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-14 flex flex-col items-center text-white/40">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.35em]">
+            Scroller pour découvrir
+          </p>
+          <ChevronDown className="mt-2 h-5 w-5 animate-bounce" />
         </div>
       </section>
     </SiteLayout>
