@@ -146,7 +146,7 @@ export function AdminShell({
                   {user.displayName}
                 </p>
                 <p className="truncate text-[10px] uppercase tracking-wider text-white/40">
-                  {user.role.replace("_", " ")}
+                  {(user.role ?? "guest").replace("_", " ")}
                 </p>
               </div>
             )}
@@ -220,7 +220,7 @@ export function AdminShell({
                   {user.displayName.split(" ")[0]}
                 </p>
                 <p className="text-[9px] uppercase tracking-wider text-white/50">
-                  {user.role.replace("_", " ")}
+                  {(user.role ?? "guest").replace("_", " ")}
                 </p>
               </div>
             </div>
