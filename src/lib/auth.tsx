@@ -1,31 +1,21 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 
-// Configurable authentication. Replace this array with a real backend later.
-// Each entry defines credentials + role. The role drives RBAC across the Back Office.
-export type Role = "super_admin" | "admin" | "commercial" | "designer";
+export type Role = "super_admin" | "admin" | "commercial" | "editor";
 
 export interface AuthUser {
-  username: string;
+  id: string;
+  email: string;
   displayName: string;
-  role: Role;
-  email?: string;
+  avatarUrl: string | null;
+  role: Role | null;
+  /** All roles granted to this user (super_admin usually implies admin capabilities via ROLE_PERMISSIONS). */
+  roles: Role[];
+  /** Convenience initials for avatars ("DR"). */
+  username: string;
 }
 
-interface StoredCredential extends AuthUser {
-  password: string;
-}
-
-export const AUTH_CREDENTIALS: StoredCredential[] = [
-  {
-    username: "DRISS",
-    password: "DRISS",
-    displayName: "Driss — Super Admin",
-    role: "super_admin",
-    email: "driss@dodricom.com",
-  },
-];
-
-// Module keys used by the sidebar / route guards.
 export type ModuleKey =
   | "dashboard"
   | "administration"
@@ -59,75 +49,168 @@ export const ROLE_PERMISSIONS: Record<Role, ModuleKey[]> = {
     "messages",
     "settings",
   ],
-  commercial: ["dashboard", "crm", "billing", "messages"],
-  designer: ["dashboard", "cms", "messages"],
+  commercial: ["dashboard", "cms", "crm", "billing", "messages"],
+  editor: ["dashboard", "cms", "messages"],
 };
 
 interface AuthContextValue {
   user: AuthUser | null;
   ready: boolean;
-  login: (username: string, password: string, remember: boolean) => { ok: true } | { ok: false; error: string };
-  logout: () => void;
+  loginWithPassword: (
+    email: string,
+    password: string,
+  ) => Promise<{ ok: true } | { ok: false; error: string }>;
+  loginWithGoogle: () => Promise<{ ok: boolean; error?: string }>;
+  signUpWithPassword: (
+    email: string,
+    password: string,
+    displayName?: string,
+  ) => Promise<{ ok: true } | { ok: false; error: string }>;
+  logout: () => Promise<void>;
   can: (module: ModuleKey) => boolean;
+  hasRole: (role: Role) => boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const STORAGE_KEY = "dodricom_auth_user";
+
+function initialsFor(displayName: string, email: string) {
+  const source = displayName || email;
+  const parts = source.split(/[\s@._-]+/).filter(Boolean);
+  if (parts.length === 0) return "??";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+async function hydrateUser(userId: string, email: string): Promise<AuthUser | null> {
+  const [profileRes, rolesRes] = await Promise.all([
+    supabase.from("profiles").select("display_name, avatar_url, email").eq("id", userId).maybeSingle(),
+    supabase.from("user_roles").select("role").eq("user_id", userId),
+  ]);
+  const profile = profileRes.data;
+  const roles = (rolesRes.data ?? []).map((r) => r.role as Role);
+  const displayName = profile?.display_name || email.split("@")[0];
+  // Priority: super_admin > admin > commercial > editor
+  const order: Role[] = ["super_admin", "admin", "commercial", "editor"];
+  const primary = order.find((r) => roles.includes(r)) ?? null;
+  return {
+    id: userId,
+    email: profile?.email || email,
+    displayName,
+    avatarUrl: profile?.avatar_url ?? null,
+    role: primary,
+    roles,
+    username: initialsFor(displayName, email),
+  };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw =
-        localStorage.getItem(STORAGE_KEY) ?? sessionStorage.getItem(STORAGE_KEY);
-      if (raw) setUser(JSON.parse(raw) as AuthUser);
-    } catch {
-      // ignore
-    }
-    setReady(true);
+    let mounted = true;
+
+    // 1) Register listener first (recommended pattern)
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      if (!session?.user) {
+        setUser(null);
+        return;
+      }
+      // Defer hydration to avoid blocking the auth callback
+      setTimeout(() => {
+        if (!mounted) return;
+        hydrateUser(session.user.id, session.user.email ?? "").then((u) => {
+          if (mounted) setUser(u);
+        });
+      }, 0);
+    });
+
+    // 2) Then check for an existing session
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      const session = data.session;
+      if (!session?.user) {
+        setReady(true);
+        return;
+      }
+      hydrateUser(session.user.id, session.user.email ?? "").then((u) => {
+        if (!mounted) return;
+        setUser(u);
+        setReady(true);
+      });
+    });
+
+    // Failsafe: mark ready even if network is slow
+    const t = setTimeout(() => mounted && setReady(true), 1500);
+
+    return () => {
+      mounted = false;
+      clearTimeout(t);
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
-  const login: AuthContextValue["login"] = (username, password, remember) => {
-    const match = AUTH_CREDENTIALS.find(
-      (c) =>
-        c.username.toLowerCase() === username.trim().toLowerCase() &&
-        c.password === password,
-    );
-    if (!match) return { ok: false, error: "Identifiants invalides." };
-    const safe: AuthUser = {
-      username: match.username,
-      displayName: match.displayName,
-      role: match.role,
-      email: match.email,
-    };
-    setUser(safe);
-    try {
-      const store = remember ? localStorage : sessionStorage;
-      store.setItem(STORAGE_KEY, JSON.stringify(safe));
-      (remember ? sessionStorage : localStorage).removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
+  const loginWithPassword: AuthContextValue["loginWithPassword"] = async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+    if (error) return { ok: false, error: error.message };
     return { ok: true };
   };
 
-  const logout = () => {
-    setUser(null);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      sessionStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
+  const signUpWithPassword: AuthContextValue["signUpWithPassword"] = async (
+    email,
+    password,
+    displayName,
+  ) => {
+    const { error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: {
+        emailRedirectTo:
+          typeof window !== "undefined" ? window.location.origin : undefined,
+        data: { display_name: displayName },
+      },
+    });
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
   };
 
-  const can: AuthContextValue["can"] = (m) =>
-    !!user && ROLE_PERMISSIONS[user.role].includes(m);
+  const loginWithGoogle: AuthContextValue["loginWithGoogle"] = async () => {
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: typeof window !== "undefined" ? window.location.origin : undefined,
+    });
+    if (result.error) return { ok: false, error: result.error.message };
+    return { ok: true };
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+  const can: AuthContextValue["can"] = (m) => {
+    if (!user) return false;
+    return user.roles.some((r) => ROLE_PERMISSIONS[r]?.includes(m));
+  };
+
+  const hasRole = (r: Role) => !!user?.roles.includes(r);
 
   return (
-    <AuthContext.Provider value={{ user, ready, login, logout, can }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        ready,
+        loginWithPassword,
+        signUpWithPassword,
+        loginWithGoogle,
+        logout,
+        can,
+        hasRole,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
