@@ -180,12 +180,11 @@ export const getProjects = createServerFn({ method: "GET" }).handler(async () =>
 
 export const getBlogPosts = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
-  const { data } = await publicClient()
+  const { data } = await supabase
     .from("blog_posts")
     .select("id, slug, title, excerpt, cover_image_url, category, author_name, read_minutes, published_at")
     .eq("status", "published")
     .order("published_at", { ascending: false });
-  void supabase;
   const posts: BlogPostDTO[] = (data ?? []).map((p) => ({
     id: p.id,
     slug: p.slug,
