@@ -1,41 +1,55 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
 import heroPortfolio from "@/assets/hero-portfolio.jpg";
-import imgDomo from "@/assets/service-domotique.jpg";
-import imgDigital from "@/assets/service-digital.jpg";
-import imgReseaux from "@/assets/service-reseaux.jpg";
-import imgIA from "@/assets/service-ia.jpg";
-import imgComm from "@/assets/service-communication.jpg";
-import imgEvents from "@/assets/service-events.jpg";
+import { getProjects } from "@/lib/content.functions";
+import { categoryImage } from "@/lib/content-images";
+
+const projectsQuery = queryOptions({
+  queryKey: ["projects"],
+  queryFn: () => getProjects(),
+});
 
 export const Route = createFileRoute("/realisations")({
+  loader: ({ context }) => {
+    void context.queryClient.ensureQueryData(projectsQuery);
+  },
   component: RealisationsPage,
+  errorComponent: ({ error }) => (
+    <SiteLayout>
+      <div role="alert" className="mx-auto max-w-3xl px-5 py-32 text-white/80">
+        Impossible de charger les réalisations : {error.message}
+      </div>
+    </SiteLayout>
+  ),
+  notFoundComponent: () => (
+    <SiteLayout>
+      <div className="mx-auto max-w-3xl px-5 py-32 text-white/80">Aucune réalisation publiée.</div>
+    </SiteLayout>
+  ),
   head: () => ({
     meta: [
       { title: "Réalisations — DODRICOM" },
       { name: "description", content: "Découvrez une sélection de projets réalisés par DODRICOM." },
+      { property: "og:title", content: "Réalisations — DODRICOM" },
+      { property: "og:description", content: "Projets sur mesure en domotique, digital, réseaux, IA, communication et événementiel." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });
 
-const FILTERS = ["Tous", "Domotique", "Digital", "Réseaux", "IA", "Communication", "Events"] as const;
-
-const PROJECTS = [
-  { title: "Villa intelligente", cat: "Domotique", img: imgDomo, desc: "Installation complète d'un système domotique centralisé, éclairage, sécurité et confort." },
-  { title: "Plateforme e-commerce", cat: "Digital", img: imgDigital, desc: "Développement d'une plateforme e-commerce performante et intuitive." },
-  { title: "Infrastructure réseau", cat: "Réseaux", img: imgReseaux, desc: "Conception et déploiement d'une infrastructure réseau sécurisée et haute disponibilité." },
-  { title: "Solution IA Predictive", cat: "IA", img: imgIA, desc: "Système d'IA prédictive pour optimiser les décisions et anticiper les tendances." },
-  { title: "Studio audiovisuel", cat: "Communication", img: imgComm, desc: "Studio audiovisuel professionnel pour la production de contenus haute qualité." },
-  { title: "Soirée entreprise", cat: "Events", img: imgEvents, desc: "Organisation clé en main : scénographie, sonorisation, éclairage et gestion." },
-  { title: "Application mobile", cat: "Digital", img: imgDigital, desc: "Application mobile intuitive et performante pour un client entreprise." },
-  { title: "Identité visuelle", cat: "Communication", img: imgComm, desc: "Création d'une identité visuelle complète pour renforcer l'image de marque." },
-];
-
 function RealisationsPage() {
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("Tous");
-  const filtered = filter === "Tous" ? PROJECTS : PROJECTS.filter((p) => p.cat === filter);
+  const { data: projects } = useSuspenseQuery(projectsQuery);
+  const [filter, setFilter] = useState("Tous");
+
+  const filters = [
+    "Tous",
+    ...Array.from(new Set(projects.map((p) => p.categoryName).filter((n): n is string => !!n))),
+  ];
+  const filtered = filter === "Tous" ? projects : projects.filter((p) => p.categoryName === filter);
 
   return (
     <SiteLayout>
@@ -49,7 +63,7 @@ function RealisationsPage() {
 
       <section className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="glass-strong flex flex-wrap items-center gap-2 p-3">
-          {FILTERS.map((f) => (
+          {filters.map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -68,23 +82,25 @@ function RealisationsPage() {
       <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {filtered.map((p) => (
-            <article key={p.title} className="glass card-hover group relative overflow-hidden p-0">
+            <article key={p.id} className="glass card-hover group relative overflow-hidden p-0">
               <div className="relative aspect-[4/3] overflow-hidden rounded-t-3xl">
                 <img
-                  src={p.img}
+                  src={categoryImage(p.categorySlug ?? "", p.coverImageUrl)}
                   alt={p.title}
                   loading="lazy"
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#05060A] via-transparent to-transparent" />
-                <span className="absolute left-4 top-4 rounded-full bg-[var(--gradient-primary)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-[0_0_20px_rgba(139,61,255,0.5)]">
-                  {p.cat}
-                </span>
+                {p.categoryName && (
+                  <span className="absolute left-4 top-4 rounded-full bg-[var(--gradient-primary)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-[0_0_20px_rgba(139,61,255,0.5)]">
+                    {p.categoryName}
+                  </span>
+                )}
                 <div className="absolute inset-0 bg-[color:var(--brand-violet)]/0 transition-colors duration-500 group-hover:bg-[color:var(--brand-violet)]/20" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-white">{p.title}</h3>
-                <p className="mt-2 line-clamp-3 text-sm text-white/70">{p.desc}</p>
+                <p className="mt-2 line-clamp-3 text-sm text-white/70">{p.summary}</p>
                 <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80 transition group-hover:text-white">
                   Voir le projet <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </span>
