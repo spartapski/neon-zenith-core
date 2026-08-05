@@ -12,7 +12,7 @@ export function Footer() {
             <Logo />
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-[color:var(--brand-text-muted)]">
               L'innovation au service de votre performance. Solutions premium en Domotique,
-              Digital, Réseaux, IA, Communication et Événementiel.
+              Digital, Réseaux, IA, COM et Événementiel.
             </p>
             <div className="mt-6 flex gap-3">
               {[Facebook, Instagram, Linkedin, Youtube].map((Icon, i) => (
@@ -51,7 +51,7 @@ export function Footer() {
           <div className="lg:col-span-3">
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Services</h4>
             <ul className="space-y-2 text-sm text-white/70">
-              {["Domotique", "Digital", "Réseaux", "Intelligence Artificielle", "Communication", "Events"].map(
+              {["Domotique", "Digital", "Réseaux", "IA", "COM", "Events"].map(
                 (s) => (
                   <li key={s}>
                     <Link to="/services" className="transition hover:text-white">
@@ -94,7 +94,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-6 text-xs text-white/50 sm:flex-row">
           <p>© {new Date().getFullYear()} DODRICOM. Tous droits réservés.</p>
-          <p>Domotique · Digital · Réseaux · IA · Communication · Events</p>
+          <p>Domotique · Digital · Réseaux · IA · COM · Events</p>
         </div>
       </div>
     </footer>

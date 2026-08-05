@@ -20,7 +20,7 @@ const STATS = [
 const TIMELINE = [
   { year: "2019", text: "Création de DODRICOM, premiers projets domotique." },
   { year: "2021", text: "Ouverture des pôles Digital & Réseaux." },
-  { year: "2023", text: "Lancement du laboratoire Intelligence Artificielle." },
+  { year: "2023", text: "Lancement du laboratoire IA." },
   { year: "2025", text: "Un écosystème complet : 6 pôles, 250+ projets." },
 ];
 
@@ -235,16 +235,16 @@ export function CinematicHero() {
                 <Sparkles className="h-4 w-4" />
                 Bienvenue chez DODRICOM
               </p>
-              <h1 className="text-5xl font-black leading-[0.95] text-white drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)] sm:text-7xl lg:text-[6.5rem]">
+              <h1 className="text-[3.25rem] font-black leading-[0.92] tracking-tight text-white drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)] sm:text-7xl lg:text-[7rem]">
                 L'innovation
                 <br />
                 qui transforme
                 <br />
                 <span className="gradient-text">votre entreprise</span>
               </h1>
-              <p className="mt-8 max-w-xl text-lg text-white/85">
+              <p className="mt-8 max-w-xl text-lg leading-relaxed text-white/85 sm:text-xl">
                 Franchissez les portes de DODRICOM. Domotique, Digital, Réseaux, IA,
-                Communication et Événementiel — un écosystème premium au service de
+                COM et Événementiel — un écosystème premium au service de
                 votre performance.
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-4">
@@ -285,12 +285,12 @@ export function CinematicHero() {
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] gradient-text">
               Qui sommes-nous
             </p>
-            <h2 className="text-3xl font-black leading-tight text-white sm:text-5xl lg:text-6xl">
+            <h2 className="text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
               Un écosystème d'expertises,
               <br />
               une seule <span className="gradient-text">signature</span>.
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-white/80 lg:text-lg">
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/80 lg:text-lg">
               Vous êtes à l'intérieur. Ici, chaque discipline — de la domotique à l'IA —
               travaille comme une équipe. Notre mission : transformer vos ambitions en
               systèmes qui performent.
