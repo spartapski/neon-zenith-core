@@ -47,9 +47,9 @@ export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
       { title: "Nos services — DODRICOM" },
-      { name: "description", content: "Domotique, Digital, Réseaux, IA, Communication et Événementiel : découvrez nos solutions premium." },
+      { name: "description", content: "Domotique, Digital, Réseaux, IA, COM et Événementiel : découvrez nos solutions premium." },
       { property: "og:title", content: "Nos services — DODRICOM" },
-      { property: "og:description", content: "Solutions premium en domotique, digital, réseaux, IA, communication et événementiel." },
+      { property: "og:description", content: "Solutions premium en domotique, digital, réseaux, IA, COM et événementiel." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

@@ -82,19 +82,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel. DODRICOM accompagne votre croissance.",
+          "Solutions premium en Domotique, Digital, Réseaux, IA, COM et Événementiel. DODRICOM accompagne votre croissance.",
       },
       { name: "author", content: "DODRICOM" },
       { property: "og:title", content: "DODRICOM — L'innovation au service de votre performance" },
       {
         property: "og:description",
         content:
-          "Solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel. DODRICOM accompagne votre croissance.",
+          "Solutions premium en Domotique, Digital, Réseaux, IA, COM et Événementiel. DODRICOM accompagne votre croissance.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "DODRICOM — L'innovation au service de votre performance" },
-      { name: "twitter:description", content: "Solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel. DODRICOM accompagne votre croissance." },
+      { name: "twitter:description", content: "Solutions premium en Domotique, Digital, Réseaux, IA, COM et Événementiel. DODRICOM accompagne votre croissance." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/286dfcbf-7f76-4377-ad4c-39901a847fb7/id-preview-219103e6--9dbc2867-8560-4eb2-8097-0acc0955c126.lovable.app-1784593791234.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/286dfcbf-7f76-4377-ad4c-39901a847fb7/id-preview-219103e6--9dbc2867-8560-4eb2-8097-0acc0955c126.lovable.app-1784593791234.png" },
     ],
@@ -108,7 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap",
       },
     ],
   }),

@@ -57,15 +57,14 @@ function AboutPage() {
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] gradient-text">
             À propos de DODRICOM
           </p>
-          <h1 className="text-5xl font-black leading-[0.95] text-white sm:text-6xl">
+          <h1 className="text-5xl font-black leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
             Présentation
             <br />
             <span className="gradient-text">Commerciale</span>
           </h1>
-          <p className="mt-6 max-w-xl text-white/75">
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/75 lg:text-lg">
             DODRICOM est une entreprise innovante spécialisée dans la Domotique,
-            le Digital, les Réseaux, l'Intelligence Artificielle, la Communication
-            et l'Événementiel.
+            le Digital, les Réseaux, l'IA, la COM et l'Événementiel.
           </p>
           <ul className="mt-8 grid max-w-xl gap-4">
             {[

@@ -20,10 +20,10 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Vivez une expérience cinématique : entrez dans le siège DODRICOM et découvrez nos solutions premium en Domotique, Digital, Réseaux, IA, Communication et Événementiel.",
+          "Vivez une expérience cinématique : entrez dans le siège DODRICOM et découvrez nos solutions premium en Domotique, Digital, Réseaux, IA, COM et Événementiel.",
       },
       { property: "og:title", content: "DODRICOM — Entrez dans le siège de l'innovation" },
-      { property: "og:description", content: "Expérience cinématique DODRICOM : domotique, digital, réseaux, IA, communication et événementiel." },
+      { property: "og:description", content: "Expérience cinématique DODRICOM : domotique, digital, réseaux, IA, COM et événementiel." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -34,8 +34,8 @@ const SERVICES = [
   { key: "domotique", label: "Domotique", icon: Home, desc: "Habitats connectés, confortables et sécurisés." },
   { key: "digital", label: "Digital", icon: Cpu, desc: "Sites web, e-commerce et outils sur mesure." },
   { key: "reseaux", label: "Réseaux", icon: Network, desc: "Infrastructures performantes et sécurisées." },
-  { key: "ia", label: "IA", icon: BrainCircuit, desc: "Automatisation et intelligence artificielle." },
-  { key: "communication", label: "Communication", icon: Megaphone, desc: "Branding, contenu et audiovisuel." },
+  { key: "ia", label: "IA", icon: BrainCircuit, desc: "Automatisation et IA." },
+  { key: "communication", label: "COM", icon: Megaphone, desc: "Branding, contenu et audiovisuel." },
   { key: "events", label: "Events", icon: Calendar, desc: "Événements clés en main, sans compromis." },
 ];
 
@@ -54,7 +54,7 @@ function HomePage() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
               Nos services
             </p>
-            <h2 className="max-w-2xl text-4xl font-black leading-tight text-white sm:text-5xl">
+            <h2 className="max-w-3xl text-[2.75rem] font-black leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
               Un écosystème complet pour <span className="gradient-text">accélérer</span> votre entreprise.
             </h2>
           </div>
@@ -107,15 +107,15 @@ function HomePage() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
               À propos de DODRICOM
             </p>
-            <h2 className="text-3xl font-black leading-tight text-white sm:text-4xl">
+            <h2 className="text-3xl font-black leading-[1.1] tracking-tight text-white sm:text-4xl lg:text-5xl">
               Une équipe passionnée. Des solutions <span className="gradient-text">sur mesure</span>.
             </h2>
-            <p className="mt-5 text-white/70">
+            <p className="mt-5 text-base leading-relaxed text-white/70 lg:text-lg">
               DODRICOM est une entreprise innovante spécialisée dans la Domotique, le Digital,
-              les Réseaux, l'Intelligence Artificielle, la Communication et l'Événementiel.
+              les Réseaux, l'IA, la COM et l'Événementiel.
               Nous accompagnons nos clients de A à Z avec des solutions robustes et évolutives.
             </p>
-            <ul className="mt-6 space-y-3 text-sm text-white/80">
+            <ul className="mt-6 space-y-3 text-sm leading-relaxed text-white/80 lg:text-base">
               {[
                 "Des solutions sur mesure adaptées à vos besoins",
                 "Une approche centrée sur la qualité et la performance",
@@ -123,7 +123,7 @@ function HomePage() {
                 "Une équipe d'experts passionnés à votre service",
               ].map((line) => (
                 <li key={line} className="flex items-start gap-3">
-                  <span className="mt-1.5 h-2 w-2 rounded-full bg-[var(--gradient-primary)] shadow-[0_0_10px_rgba(139,61,255,0.8)]" />
+                  <span className="mt-2 h-2 w-2 rounded-full bg-[var(--gradient-primary)] shadow-[0_0_10px_rgba(139,61,255,0.8)]" />
                   {line}
                 </li>
               ))}
@@ -147,10 +147,10 @@ function HomePage() {
           <div className="absolute inset-0 opacity-40 [background:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.35),transparent_45%)]" />
           <div className="relative flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
             <div>
-              <h2 className="text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl">
+              <h2 className="text-3xl font-black leading-[1.05] tracking-tight text-white sm:text-4xl lg:text-5xl">
                 Prêt à passer à la vitesse supérieure ?
               </h2>
-              <p className="mt-3 max-w-xl text-white/85">
+              <p className="mt-3 max-w-xl text-base leading-relaxed text-white/85 lg:text-lg">
                 Discutons de votre projet. Nous vous répondons sous 24 h avec un devis clair et détaillé.
               </p>
             </div>
