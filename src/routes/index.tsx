@@ -1,25 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Award,
   BrainCircuit,
-  Briefcase,
   Calendar,
-  ChevronDown,
   Cpu,
-  Headphones,
   Home,
-  Mail,
-  MapPin,
   Megaphone,
   Network,
-  Phone,
-  Play,
-  Users,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import heroBuilding from "@/assets/hero-building.jpg";
+import { CinematicHero } from "@/components/site/CinematicHero";
 import aboutReception from "@/assets/about-reception.jpg";
 
 export const Route = createFileRoute("/")({
@@ -49,124 +39,13 @@ const SERVICES = [
   { key: "events", label: "Events", icon: Calendar, desc: "Événements clés en main, sans compromis." },
 ];
 
-const STATS = [
-  { icon: Users, value: "120+", label: "Clients satisfaits" },
-  { icon: Briefcase, value: "250+", label: "Projets réalisés" },
-  { icon: Award, value: "5+", label: "Années d'expérience" },
-  { icon: Headphones, value: "24/7", label: "Support technique" },
-];
-
 function HomePage() {
   return (
     <SiteLayout>
-      {/* HERO — DODRICOM headquarters at night */}
-      <section className="relative -mt-[78px] min-h-screen overflow-hidden lg:-mt-[90px]">
-        <img
-          src={heroBuilding}
-          alt="Siège DODRICOM illuminé la nuit"
-          className="absolute inset-0 h-full w-full object-cover"
-          loading="eager"
-        />
-        {/* Left → right dark veil for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#05060A] via-[#05060A]/85 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#05060A] via-transparent to-[#05060A]/40" />
-
-        {/* Floating contact rail (right side) */}
-        <div className="absolute right-5 top-1/2 z-20 hidden -translate-y-1/2 flex-col gap-3 lg:flex">
-          {[
-            { icon: Phone, label: "Appeler" },
-            { icon: Mail, label: "Email" },
-            { icon: MapPin, label: "Adresse" },
-          ].map(({ icon: Icon, label }) => (
-            <button
-              key={label}
-              aria-label={label}
-              className="grid h-12 w-12 place-items-center rounded-full border border-white/15 bg-white/[0.06] text-white/80 backdrop-blur-xl transition hover:border-[color:var(--brand-violet)]/60 hover:text-white hover:shadow-[0_0_25px_rgba(139,61,255,0.5)]"
-            >
-              <Icon className="h-5 w-5" />
-            </button>
-          ))}
-        </div>
-
-        <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-5 pb-40 pt-32 lg:px-8 lg:pb-48">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-5 text-xs font-semibold uppercase tracking-[0.35em] gradient-text"
-          >
-            L'innovation au service de
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="max-w-3xl text-5xl font-black leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl"
-          >
-            VOTRE
-            <br />
-            PERFORMANCE
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="mt-6 max-w-xl text-lg text-white/75"
-          >
-            Des solutions intelligentes en Domotique, Digital, Réseaux, IA,
-            Communication et Événementiel pour accompagner votre croissance.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.35 }}
-            className="mt-9 flex flex-wrap items-center gap-4"
-          >
-            <Link
-              to="/services"
-              className="btn-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold"
-            >
-              Découvrir nos services <ArrowRight className="h-4 w-4" />
-            </Link>
-            <button
-              type="button"
-              className="inline-flex items-center gap-3 rounded-full text-sm font-semibold text-white/90 transition hover:text-white"
-            >
-              <span className="grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-white/[0.06] backdrop-blur-xl">
-                <Play className="h-4 w-4 fill-white" />
-              </span>
-              Voir notre vidéo
-            </button>
-          </motion.div>
-
-          {/* Stats row */}
-          <motion.dl
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.5 }}
-            className="mt-16 grid max-w-3xl grid-cols-2 gap-6 sm:grid-cols-4"
-          >
-            {STATS.map(({ icon: Icon, value, label }) => (
-              <div key={label}>
-                <Icon className="mb-2 h-6 w-6 text-[color:var(--brand-violet)]" />
-                <dt className="text-3xl font-black text-white">{value}</dt>
-                <dd className="mt-1 text-[11px] uppercase tracking-wider text-white/55">
-                  {label}
-                </dd>
-              </div>
-            ))}
-          </motion.dl>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-center text-white/60">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.35em]">
-            Scroll pour découvrir
-          </p>
-          <ChevronDown className="mx-auto mt-2 h-5 w-5 animate-bounce" />
-        </div>
-      </section>
+      {/* HERO — cinematic scroll into the DODRICOM headquarters */}
+      <div className="-mt-[78px] lg:-mt-[90px]">
+        <CinematicHero />
+      </div>
 
       {/* SERVICES GRID */}
       <section className="relative mx-auto max-w-7xl px-5 py-24 lg:px-8">
