@@ -27,7 +27,6 @@ import { Route as AdminCrmRouteImport } from './routes/admin.crm'
 import { Route as AdminCmsRouteImport } from './routes/admin.cms'
 import { Route as AdminBillingRouteImport } from './routes/admin.billing'
 import { Route as AdminAdministrationRouteImport } from './routes/admin.administration'
-import { Route as ApiPublicBootstrapAdminRouteImport } from './routes/api/public/bootstrap-admin'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -119,11 +118,6 @@ const AdminAdministrationRoute = AdminAdministrationRouteImport.update({
   path: '/administration',
   getParentRoute: () => AdminRoute,
 } as any)
-const ApiPublicBootstrapAdminRoute = ApiPublicBootstrapAdminRouteImport.update({
-  id: '/api/public/bootstrap-admin',
-  path: '/api/public/bootstrap-admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -144,7 +138,6 @@ export interface FileRoutesByFullPath {
   '/admin/saas': typeof AdminSaasRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/': typeof AdminIndexRoute
-  '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -164,7 +157,6 @@ export interface FileRoutesByTo {
   '/admin/saas': typeof AdminSaasRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin': typeof AdminIndexRoute
-  '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -186,7 +178,6 @@ export interface FileRoutesById {
   '/admin/saas': typeof AdminSaasRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/': typeof AdminIndexRoute
-  '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -209,7 +200,6 @@ export interface FileRouteTypes {
     | '/admin/saas'
     | '/admin/settings'
     | '/admin/'
-    | '/api/public/bootstrap-admin'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -229,7 +219,6 @@ export interface FileRouteTypes {
     | '/admin/saas'
     | '/admin/settings'
     | '/admin'
-    | '/api/public/bootstrap-admin'
   id:
     | '__root__'
     | '/'
@@ -250,7 +239,6 @@ export interface FileRouteTypes {
     | '/admin/saas'
     | '/admin/settings'
     | '/admin/'
-    | '/api/public/bootstrap-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -263,7 +251,6 @@ export interface RootRouteChildren {
   SaasRoute: typeof SaasRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  ApiPublicBootstrapAdminRoute: typeof ApiPublicBootstrapAdminRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -394,13 +381,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdministrationRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/api/public/bootstrap-admin': {
-      id: '/api/public/bootstrap-admin'
-      path: '/api/public/bootstrap-admin'
-      fullPath: '/api/public/bootstrap-admin'
-      preLoaderRoute: typeof ApiPublicBootstrapAdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -440,7 +420,6 @@ const rootRouteChildren: RootRouteChildren = {
   SaasRoute: SaasRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  ApiPublicBootstrapAdminRoute: ApiPublicBootstrapAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
