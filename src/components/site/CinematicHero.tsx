@@ -173,7 +173,7 @@ export function CinematicHero() {
 
         {/* Partners marquee — visible when the camera reaches the doors */}
         <motion.div
-          className="absolute inset-x-0 bottom-10 z-30 flex flex-col items-center gap-6"
+          className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-6"
           style={{ opacity: doorsOpacity }}
         >
           <PartnersMarquee />
