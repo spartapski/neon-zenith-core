@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useSpring, type MotionValue } from "framer-motion";
 import Lenis from "lenis";
 import { Link } from "@tanstack/react-router";
@@ -20,6 +20,17 @@ const TIMELINE = [
   { year: "2021", text: "Ouverture des pôles Digital & Réseaux." },
   { year: "2023", text: "Lancement du laboratoire IA." },
   { year: "2025", text: "Un écosystème complet : 6 pôles, 250+ projets." },
+];
+
+const PARTNERS = [
+  { name: "OCP Group", short: "OCP" },
+  { name: "Maroc Telecom", short: "IAM" },
+  { name: "Attijariwafa Bank", short: "AWB" },
+  { name: "Royal Air Maroc", short: "RAM" },
+  { name: "Marjane Holding", short: "MARJANE" },
+  { name: "Managem", short: "MANAGEM" },
+  { name: "CDG Développement", short: "CDG" },
+  { name: "Label'Vie", short: "LABEL'VIE" },
 ];
 
 /**
@@ -158,6 +169,14 @@ export function CinematicHero() {
             />
           </motion.div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#05060A_95%)]" />
+        </motion.div>
+
+        {/* Partners marquee — visible when the camera reaches the doors */}
+        <motion.div
+          className="absolute inset-x-0 bottom-10 z-30 flex flex-col items-center gap-6"
+          style={{ opacity: doorsOpacity }}
+        >
+          <PartnersMarquee />
         </motion.div>
 
         {/* Scene 3 — Accueil / reception desk, final camera position */}
