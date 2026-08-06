@@ -321,6 +321,72 @@ function ScrollRail({ progress }: { progress: MotionValue<number> }) {
   );
 }
 
+function PartnersMarquee() {
+  const [selected, setSelected] = useState<string | null>(null);
+  const items = [...PARTNERS, ...PARTNERS];
+
+  return (
+    <div className="pointer-events-auto w-full">
+      <div className="mx-auto max-w-6xl overflow-hidden px-5 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+        <div
+          className="flex w-max items-center gap-10 animate-marquee-x"
+          style={{ animationPlayState: selected ? "paused" : "running" }}
+        >
+          {items.map((p, i) => {
+            const active = selected === p.name;
+            return (
+              <button
+                key={`${p.name}-${i}`}
+                type="button"
+                onClick={() => setSelected(active ? null : p.name)}
+                className="glass shrink-0 px-6 py-3 transition-all duration-300"
+                style={{
+                  filter: active ? "none" : "grayscale(1)",
+                  opacity: active ? 1 : 0.55,
+                  borderColor: active ? "rgba(139,61,255,0.6)" : undefined,
+                  boxShadow: active ? "var(--shadow-glow)" : undefined,
+                }}
+                aria-label={p.name}
+              >
+                <span
+                  className={`whitespace-nowrap text-lg font-black tracking-[0.18em] ${active ? "gradient-text" : "text-white"}`}
+                >
+                  {p.short}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-6 flex h-14 items-center justify-center px-5 text-center">
+        {selected && (
+          <motion.p
+            key={selected}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="gradient-text text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl"
+          >
+            {selected}
+          </motion.p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function _UnusedRail({ progress }: { progress: MotionValue<number> }) {
+  const height = useTransform(progress, [0, 1], ["0%", "100%"]);
+  return (
+    <div className="pointer-events-none fixed right-4 top-1/2 z-40 hidden h-40 w-[2px] -translate-y-1/2 rounded-full bg-white/10 lg:block">
+      <motion.div
+        className="w-full rounded-full bg-[var(--gradient-primary)] shadow-[0_0_10px_rgba(139,61,255,0.8)]"
+        style={{ height }}
+      />
+    </div>
+  );
+}
+
 function FloatingParticles() {
   const particles = Array.from({ length: 18 });
   return (
