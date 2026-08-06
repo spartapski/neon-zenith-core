@@ -11,50 +11,27 @@ export function LoginModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const { loginWithPassword, signUpWithPassword, loginWithGoogle } = useAuth();
+  const { loginWithPassword } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
   const [remember, setRemember] = useState(true);
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setInfo(null);
     setLoading(true);
-    const res =
-      mode === "signin"
-        ? await loginWithPassword(email, password)
-        : await signUpWithPassword(email, password, displayName || undefined);
+    const res = await loginWithPassword(email, password);
     setLoading(false);
     if (!res.ok) {
       setError(res.error);
       return;
     }
-    if (mode === "signup") {
-      setInfo("Compte créé. Vérifiez votre email pour confirmer si nécessaire.");
-      setMode("signin");
-      return;
-    }
     onClose();
     navigate({ to: "/admin" });
-  };
-
-  const handleGoogle = async () => {
-    setError(null);
-    setLoading(true);
-    const res = await loginWithGoogle();
-    if (!res.ok) {
-      setLoading(false);
-      setError(res.error ?? "Google sign-in a échoué.");
-    }
-    // On success the page redirects; keep loading state.
   };
 
   return (
@@ -112,46 +89,11 @@ export function LoginModal({
                   Secure Back Office Access
                 </h2>
                 <p className="mt-2 text-sm text-white/60">
-                  {mode === "signin"
-                    ? "Sign in to access the administration platform."
-                    : "Create your DODRICOM administrator account."}
+                  Accès réservé à l'administration DODRICOM.
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={handleGoogle}
-                disabled={loading}
-                className="relative mb-4 flex w-full items-center justify-center gap-3 rounded-2xl border border-white/15 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/[0.08] disabled:opacity-60"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden>
-                  <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.4-1.6 4.1-5.5 4.1-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.9 3.5 14.7 2.5 12 2.5 6.8 2.5 2.6 6.7 2.6 12S6.8 21.5 12 21.5c6.9 0 9.4-4.8 9.4-7.3 0-.5 0-.9-.1-1.3H12z"/>
-                </svg>
-                Continue with Google
-              </button>
-
-              <div className="relative mb-4 flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] text-white/40">
-                <span className="h-px flex-1 bg-white/10" />
-                or email
-                <span className="h-px flex-1 bg-white/10" />
-              </div>
-
               <form onSubmit={submit} className="relative space-y-4">
-                {mode === "signup" && (
-                  <Field
-                    icon={<Shield className="h-4 w-4" />}
-                    label="Nom affiché"
-                  >
-                    <input
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      required
-                      className="w-full bg-transparent text-sm text-white placeholder-white/30 outline-none"
-                      placeholder="Driss Admin"
-                      maxLength={80}
-                    />
-                  </Field>
-                )}
                 <Field
                   icon={<Mail className="h-4 w-4" />}
                   label="Email"
@@ -164,7 +106,7 @@ export function LoginModal({
                     autoComplete="email"
                     required
                     className="w-full bg-transparent text-sm text-white placeholder-white/30 outline-none"
-                    placeholder="you@dodricom.com"
+                    placeholder="admin@dodricom.com"
                   />
                 </Field>
 
@@ -203,27 +145,11 @@ export function LoginModal({
                     />
                     Se souvenir de moi
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode(mode === "signin" ? "signup" : "signin");
-                      setError(null);
-                      setInfo(null);
-                    }}
-                    className="text-white/60 hover:text-white"
-                  >
-                    {mode === "signin" ? "Créer un compte" : "J'ai déjà un compte"}
-                  </button>
                 </div>
 
                 {error && (
                   <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
                     {error}
-                  </div>
-                )}
-                {info && (
-                  <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
-                    {info}
                   </div>
                 )}
 
@@ -238,7 +164,7 @@ export function LoginModal({
                         <Loader2 className="h-4 w-4 animate-spin" /> Connexion…
                       </>
                     ) : (
-                      mode === "signin" ? "Sign In" : "Créer le compte"
+                      "Se connecter"
                     )}
                   </button>
                   <button
