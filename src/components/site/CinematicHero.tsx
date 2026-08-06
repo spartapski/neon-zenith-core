@@ -375,18 +375,6 @@ function PartnersMarquee() {
   );
 }
 
-function _UnusedRail({ progress }: { progress: MotionValue<number> }) {
-  const height = useTransform(progress, [0, 1], ["0%", "100%"]);
-  return (
-    <div className="pointer-events-none fixed right-4 top-1/2 z-40 hidden h-40 w-[2px] -translate-y-1/2 rounded-full bg-white/10 lg:block">
-      <motion.div
-        className="w-full rounded-full bg-[var(--gradient-primary)] shadow-[0_0_10px_rgba(139,61,255,0.8)]"
-        style={{ height }}
-      />
-    </div>
-  );
-}
-
 function FloatingParticles() {
   const particles = Array.from({ length: 18 });
   return (
