@@ -5,9 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles, MousePointer2, Award, Briefcase, Headphones, Users } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import exteriorImg from "@/assets/scene-exterior.jpg";
-import gardenImg from "@/assets/scene-garden.jpg";
 import doorsImg from "@/assets/scene-doors.jpg";
-import interiorImg from "@/assets/scene-interior.jpg";
 import receptionImg from "@/assets/scene-reception-desk.jpg";
 
 const STATS = [
@@ -63,36 +61,24 @@ export function CinematicHero() {
     mass: 0.6,
   });
 
-  // Scene 1 — Exterior: camera walks forward (40 m → entrance)
-  const exteriorScale = useTransform(progress, [0, 0.26], [1, 1.85]);
-  const exteriorOpacity = useTransform(progress, [0, 0.18, 0.26], [1, 1, 0]);
+  // Scene 1 — Exterior: camera walks forward toward the entrance
+  const exteriorScale = useTransform(progress, [0, 0.4], [1, 2]);
+  const exteriorOpacity = useTransform(progress, [0, 0.3, 0.4], [1, 1, 0]);
   const exteriorFilter = useTransform(
-    useTransform(progress, [0.16, 0.26], [0, 6]),
+    useTransform(progress, [0.28, 0.4], [0, 6]),
     (b) => `blur(${b}px)`,
   );
 
-  // Scene 2 — Front garden & stairs
-  const gardenScale = useTransform(progress, [0.2, 0.48], [1.05, 2.1]);
-  const gardenOpacity = useTransform(progress, [0.2, 0.28, 0.42, 0.5], [0, 1, 1, 0]);
-  const gardenFilter = useTransform(
-    useTransform(progress, [0.4, 0.5], [0, 6]),
-    (b) => `blur(${b}px)`,
-  );
+  // Scene 2 — Glass doors, opening automatically as we arrive
+  const doorsScale = useTransform(progress, [0.34, 0.74], [1.05, 2.6]);
+  const doorsOpacity = useTransform(progress, [0.34, 0.44, 0.68, 0.76], [0, 1, 1, 0]);
+  const leftDoorX = useTransform(progress, [0.56, 0.72], ["0%", "-62%"]);
+  const rightDoorX = useTransform(progress, [0.56, 0.72], ["0%", "62%"]);
+  const doorsGap = useTransform(progress, [0.56, 0.72], [0, 1]);
 
-  // Scene 3 — Glass doors, opening automatically as we arrive
-  const doorsScale = useTransform(progress, [0.44, 0.7], [1.05, 2.6]);
-  const doorsOpacity = useTransform(progress, [0.44, 0.52, 0.66, 0.72], [0, 1, 1, 0]);
-  const leftDoorX = useTransform(progress, [0.55, 0.68], ["0%", "-62%"]);
-  const rightDoorX = useTransform(progress, [0.55, 0.68], ["0%", "62%"]);
-  const doorsGap = useTransform(progress, [0.55, 0.68], [0, 1]);
-
-  // Scene 4 — Interior hall, camera keeps gliding
-  const interiorScale = useTransform(progress, [0.62, 0.86], [1.6, 1.12]);
-  const interiorOpacity = useTransform(progress, [0.62, 0.7, 0.84, 0.9], [0, 1, 1, 0]);
-
-  // Scene 5 — Reception desk: camera decelerates and stops
-  const receptionScale = useTransform(progress, [0.82, 0.96], [1.25, 1]);
-  const receptionOpacity = useTransform(progress, [0.82, 0.9], [0, 1]);
+  // Scene 3 — Reception (accueil): camera decelerates and stops
+  const receptionScale = useTransform(progress, [0.68, 0.94], [1.35, 1]);
+  const receptionOpacity = useTransform(progress, [0.68, 0.78], [0, 1]);
   const receptionVeil = useTransform(progress, [0.88, 1], [0, 0.72]);
 
   // Hero text overlay fades out early
@@ -103,7 +89,7 @@ export function CinematicHero() {
   const presOpacity = useTransform(progress, [0.9, 0.98], [0, 1]);
   const presY = useTransform(progress, [0.9, 1], [50, 0]);
 
-  const glowOpacity = useTransform(progress, [0, 0.26], [1, 0]);
+  const glowOpacity = useTransform(progress, [0, 0.3], [1, 0]);
   const hintOpacity = useTransform(progress, [0, 0.06], [1, 0]);
 
   return (
@@ -137,24 +123,7 @@ export function CinematicHero() {
           <FloatingParticles />
         </motion.div>
 
-        {/* Scene 2 — Front garden, stairs & entrance canopy */}
-        <motion.div
-          className="absolute inset-0 will-change-transform"
-          style={{ scale: gardenScale, opacity: gardenOpacity, filter: gardenFilter }}
-        >
-          <img
-            src={gardenImg}
-            alt="Allée et escaliers illuminés menant à l'entrée du siège DODRICOM"
-            width={1920}
-            height={1088}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,#05060A_95%)]" />
-          <FloatingParticles />
-        </motion.div>
-
-        {/* Scene 3 — Doors */}
+        {/* Scene 2 — Doors */}
         <motion.div
           className="absolute inset-0 will-change-transform"
           style={{ scale: doorsScale, opacity: doorsOpacity }}
@@ -191,23 +160,7 @@ export function CinematicHero() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#05060A_95%)]" />
         </motion.div>
 
-        {/* Scene 4 — Interior hall */}
-        <motion.div
-          className="absolute inset-0 will-change-transform"
-          style={{ scale: interiorScale, opacity: interiorOpacity }}
-        >
-          <img
-            src={interiorImg}
-            alt="Hall de réception DODRICOM"
-            width={1920}
-            height={1080}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#05060A]/40 via-transparent to-[#05060A]/80" />
-        </motion.div>
-
-        {/* Scene 5 — Reception desk, final camera position */}
+        {/* Scene 3 — Accueil / reception desk, final camera position */}
         <motion.div
           className="absolute inset-0 will-change-transform"
           style={{ scale: receptionScale, opacity: receptionOpacity }}
@@ -235,14 +188,14 @@ export function CinematicHero() {
                 <Sparkles className="h-4 w-4" />
                 Bienvenue chez DODRICOM
               </p>
-              <h1 className="text-[3.25rem] font-black leading-[0.92] tracking-tight text-white drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)] sm:text-7xl lg:text-[7rem]">
+              <h1 className="text-[1.65rem] font-black leading-[0.95] tracking-tight text-white drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)] sm:text-4xl lg:text-[3.5rem]">
                 L'innovation
                 <br />
                 qui transforme
                 <br />
                 <span className="gradient-text">votre entreprise</span>
               </h1>
-              <p className="mt-8 max-w-xl text-lg leading-relaxed text-white/85 sm:text-xl">
+              <p className="mt-5 max-w-md text-sm leading-relaxed text-white/85 sm:text-base">
                 Franchissez les portes de DODRICOM. Domotique, Digital, Réseaux, IA,
                 COM et Événementiel — un écosystème premium au service de
                 votre performance.
