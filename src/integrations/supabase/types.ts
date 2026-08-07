@@ -176,6 +176,33 @@ export type Database = {
           },
         ]
       }
+      content_texts: {
+        Row: {
+          created_at: string
+          id: string
+          page_slug: string
+          text_key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          page_slug: string
+          text_key: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          page_slug?: string
+          text_key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       media_assets: {
         Row: {
           alt_text: string | null
