@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { Calendar, Clock, Search, ArrowRight } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
+import { useT } from "@/lib/site-text-context";
 import { getBlogPosts } from "@/lib/content.functions";
 import { CATEGORY_IMAGES } from "@/lib/content-images";
 import imgDigital from "@/assets/service-digital.jpg";
@@ -55,13 +56,14 @@ function formatDate(value: string | null) {
 
 function BlogPage() {
   const { data: posts } = useSuspenseQuery(postsQuery);
+  const t = useT("blog");
 
   return (
     <SiteLayout>
       <PageHeader
-        eyebrow="Blog"
-        title={<>Actualités & <span className="gradient-text">insights</span></>}
-        subtitle="Décryptages, retours d'expérience et bonnes pratiques par l'équipe DODRICOM."
+        eyebrow={t("hero.eyebrow")}
+        title={<>{t("hero.title1")} <span className="gradient-text">{t("hero.title2")}</span></>}
+        subtitle={t("hero.subtitle")}
       />
 
       <section className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -69,7 +71,7 @@ function BlogPage() {
           <Search className="h-4 w-4 text-white/60" />
           <input
             type="search"
-            placeholder="Rechercher un article…"
+            placeholder={t("search.placeholder")}
             className="flex-1 bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
           />
         </div>
@@ -77,7 +79,7 @@ function BlogPage() {
 
       <section className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
         {posts.length === 0 ? (
-          <p className="glass p-8 text-sm text-white/60">Aucun article publié pour le moment.</p>
+          <p className="glass p-8 text-sm text-white/60">{t("empty")}</p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((p) => (
@@ -110,7 +112,7 @@ function BlogPage() {
                   {p.excerpt && <p className="mt-2 line-clamp-3 text-sm text-white/65">{p.excerpt}</p>}
                   {p.authorName && <p className="mt-2 text-xs text-white/60">Par {p.authorName}</p>}
                   <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80 transition group-hover:text-white">
-                    Lire l'article <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                    {t("card.cta")} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                   </span>
                 </div>
               </article>

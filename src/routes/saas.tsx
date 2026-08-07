@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, ArrowRight, Users, FileText, ShoppingCart, KanbanSquare, LifeBuoy, Building2 } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
+import { useT } from "@/lib/site-text-context";
 import heroSaas from "@/assets/hero-saas.jpg";
 
 export const Route = createFileRoute("/saas")({
@@ -29,12 +30,13 @@ const PLANS = [
 ];
 
 function SaasPage() {
+  const t = useT("saas");
   return (
     <SiteLayout>
       <PageHeader
-        eyebrow="Solutions SaaS"
-        title={<>Vos outils métiers <span className="gradient-text">dans le cloud</span>.</>}
-        subtitle="Une suite d'applications SaaS pensée pour piloter votre activité, sans installation ni maintenance."
+        eyebrow={t("hero.eyebrow")}
+        title={<>{t("hero.title1")} <span className="gradient-text">{t("hero.title2")}</span>.</>}
+        subtitle={t("hero.subtitle")}
         bgImage={heroSaas}
         bgAlt="Espace de travail cloud SaaS DODRICOM"
       />
@@ -55,13 +57,13 @@ function SaasPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <p className="mb-8 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">Abonnements</p>
+        <p className="mb-8 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">{t("plans.title")}</p>
         <div className="grid gap-5 lg:grid-cols-3">
           {PLANS.map((p) => (
             <div key={p.name} className={`glass p-8 ${p.popular ? "border-[color:var(--brand-violet)]/60 shadow-[0_0_40px_rgba(139,61,255,0.35)]" : ""}`}>
               {p.popular && (
                 <span className="mb-3 inline-block rounded-full bg-[var(--gradient-primary)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
-                  Populaire
+                  {t("plans.popular")}
                 </span>
               )}
               <h3 className="text-xl font-bold text-white">{p.name}</h3>
@@ -78,7 +80,7 @@ function SaasPage() {
                 ))}
               </ul>
               <Link to="/contact" className="btn-gradient mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold">
-                Choisir <ArrowRight className="h-4 w-4" />
+                {t("plans.cta")} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           ))}

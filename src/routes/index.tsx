@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { CinematicHero } from "@/components/site/CinematicHero";
+import { useT } from "@/lib/site-text-context";
 import aboutReception from "@/assets/about-reception.jpg";
 
 export const Route = createFileRoute("/")({
@@ -40,6 +41,7 @@ const SERVICES = [
 ];
 
 function HomePage() {
+  const t = useT("accueil");
   return (
     <SiteLayout>
       {/* HERO — cinematic scroll into the DODRICOM headquarters */}
@@ -52,17 +54,17 @@ function HomePage() {
         <div className="mb-14 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
-              Nos services
+              {t("services.eyebrow")}
             </p>
             <h2 className="max-w-3xl text-[2.75rem] font-black leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Un écosystème complet pour <span className="gradient-text">accélérer</span> votre entreprise.
+              {t("services.title")}
             </h2>
           </div>
           <Link
             to="/services"
             className="btn-ghost-glow inline-flex items-center gap-2 self-start rounded-full px-5 py-2.5 text-sm font-semibold"
           >
-            Voir tous les services <ArrowRight className="h-4 w-4" />
+            {t("services.cta")} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
@@ -105,23 +107,21 @@ function HomePage() {
           </div>
           <div className="flex flex-col justify-center p-6 lg:p-10">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
-              À propos de DODRICOM
+              {t("about.eyebrow")}
             </p>
             <h2 className="text-3xl font-black leading-[1.1] tracking-tight text-white sm:text-4xl lg:text-5xl">
-              Une équipe passionnée. Des solutions <span className="gradient-text">sur mesure</span>.
+              {t("about.title")}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-white/70 lg:text-lg">
-              DODRICOM est une entreprise innovante spécialisée dans la Domotique, le Digital,
-              les Réseaux, l'IA, la COM et l'Événementiel.
-              Nous accompagnons nos clients de A à Z avec des solutions robustes et évolutives.
+              {t("about.body")}
             </p>
             <ul className="mt-6 space-y-3 text-sm leading-relaxed text-white/80 lg:text-base">
               {[
-                "Des solutions sur mesure adaptées à vos besoins",
-                "Une approche centrée sur la qualité et la performance",
-                "Un accompagnement de A à Z",
-                "Une équipe d'experts passionnés à votre service",
-              ].map((line) => (
+                t("about.bullet1"),
+                t("about.bullet2"),
+                t("about.bullet3"),
+                t("about.bullet4"),
+              ].filter(Boolean).map((line) => (
                 <li key={line} className="flex items-start gap-3">
                   <span className="mt-2 h-2 w-2 rounded-full bg-[var(--gradient-primary)] shadow-[0_0_10px_rgba(139,61,255,0.8)]" />
                   {line}
@@ -133,7 +133,7 @@ function HomePage() {
                 to="/a-propos"
                 className="btn-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold"
               >
-                En savoir plus <ArrowRight className="h-4 w-4" />
+                {t("about.cta")} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -148,17 +148,17 @@ function HomePage() {
           <div className="relative flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
             <div>
               <h2 className="text-3xl font-black leading-[1.05] tracking-tight text-white sm:text-4xl lg:text-5xl">
-                Prêt à passer à la vitesse supérieure ?
+                {t("cta.title")}
               </h2>
               <p className="mt-3 max-w-xl text-base leading-relaxed text-white/85 lg:text-lg">
-                Discutons de votre projet. Nous vous répondons sous 24 h avec un devis clair et détaillé.
+                {t("cta.body")}
               </p>
             </div>
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 rounded-full bg-black px-7 py-4 text-sm font-semibold text-white shadow-2xl transition hover:bg-black/85"
             >
-              Demander un devis <ArrowRight className="h-4 w-4" />
+              {t("cta.button")} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

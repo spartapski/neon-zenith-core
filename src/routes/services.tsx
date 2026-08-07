@@ -19,6 +19,7 @@ import {
   Zap,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { useT } from "@/lib/site-text-context";
 import { getServicesContent } from "@/lib/content.functions";
 import { categoryImage, productImage } from "@/lib/content-images";
 
@@ -65,12 +66,7 @@ const ICONS: Record<string, typeof Home> = {
   events: Calendar,
 };
 
-const BENEFITS = [
-  { icon: Rocket, title: "Installation rapide", desc: "En moins de 24 h." },
-  { icon: Zap, title: "Performance", desc: "Solutions rapides et optimisées." },
-  { icon: Shield, title: "Sécurité", desc: "Protection et sauvegardes incluses." },
-  { icon: Leaf, title: "Économies", desc: "Jusqu'à 30 % d'économies." },
-];
+const BENEFIT_ICONS = [Rocket, Zap, Shield, Leaf];
 
 function formatPrice(price: number | null, currency: string, period?: string | null) {
   if (price === null) return "Sur devis";
@@ -81,7 +77,13 @@ function formatPrice(price: number | null, currency: string, period?: string | n
 
 function ServicesPage() {
   const { data } = useSuspenseQuery(servicesQuery);
+  const t = useT("services");
   const { categories, products, packages } = data;
+  const BENEFITS = BENEFIT_ICONS.map((icon, i) => ({
+    icon,
+    title: t(`benefit.${i + 1}.title`),
+    desc: t(`benefit.${i + 1}.desc`),
+  }));
   const [active, setActive] = useState(categories[0]?.slug ?? "");
   const category = categories.find((c) => c.slug === active) ?? categories[0];
   const scroller = useRef<HTMLDivElement>(null);
@@ -118,7 +120,7 @@ function ServicesPage() {
           <div className="grid gap-8 lg:grid-cols-[minmax(0,340px)_1fr] lg:items-start">
             <div>
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] gradient-text">
-                Nos services
+                {t("hero.eyebrow")}
               </p>
               <h1 className="text-5xl font-black uppercase leading-none text-white sm:text-6xl">
                 {category.name}
@@ -162,7 +164,7 @@ function ServicesPage() {
       {/* PRODUCTS — Apple-store style cards */}
       <section className="relative mx-auto max-w-7xl px-5 pb-10 lg:px-8">
         <div className="mb-5 flex items-end justify-between">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] gradient-text">Les produits</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] gradient-text">{t("products.title")}</p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => scrollBy(-1)}
@@ -183,7 +185,7 @@ function ServicesPage() {
 
         {catProducts.length === 0 ? (
           <p className="glass p-8 text-sm text-white/60">
-            Les produits de ce pôle arrivent très bientôt.
+            {t("products.empty")}
           </p>
         ) : (
           <div
@@ -224,7 +226,7 @@ function ServicesPage() {
                       to="/contact"
                       className="inline-flex items-center gap-1 text-xs font-semibold text-white/70 transition group-hover:text-white"
                     >
-                      Demander <ArrowRight className="h-3.5 w-3.5" />
+                      {t("products.cta")} <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
                 </div>
@@ -244,7 +246,7 @@ function ServicesPage() {
       {/* PACKS + BENEFITS */}
       <section className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
         <p className="mb-6 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
-          Nos packs {category.name.toLowerCase()}
+          {t("packs.title")} {category.name.toLowerCase()}
         </p>
         <div className="grid gap-5 lg:grid-cols-4">
           {catPacks.map((pack) => (
@@ -282,7 +284,7 @@ function ServicesPage() {
                 to="/contact"
                 className="btn-gradient mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold"
               >
-                {pack.ctaLabel ?? "Choisir ce pack"} <ArrowRight className="h-3.5 w-3.5" />
+                {pack.ctaLabel ?? t("packs.cta")} <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           ))}
@@ -305,7 +307,7 @@ function ServicesPage() {
         </div>
 
         <div className="mt-14 flex flex-col items-center text-white/40">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.35em]">Scroller pour découvrir</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.35em]">{t("scroll.hint")}</p>
           <ChevronDown className="mt-2 h-5 w-5 animate-bounce" />
         </div>
       </section>
