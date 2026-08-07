@@ -3,6 +3,7 @@ import { useState } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
+import { useT } from "@/lib/site-text-context";
 import heroPortfolio from "@/assets/hero-portfolio.jpg";
 import { getProjects } from "@/lib/content.functions";
 import { categoryImage } from "@/lib/content-images";
@@ -43,20 +44,22 @@ export const Route = createFileRoute("/realisations")({
 
 function RealisationsPage() {
   const { data: projects } = useSuspenseQuery(projectsQuery);
-  const [filter, setFilter] = useState("Tous");
+  const t = useT("realisations");
+  const allLabel = t("filter.all");
+  const [filter, setFilter] = useState("__all__");
 
   const filters = [
-    "Tous",
+    "__all__",
     ...Array.from(new Set(projects.map((p) => p.categoryName).filter((n): n is string => !!n))),
   ];
-  const filtered = filter === "Tous" ? projects : projects.filter((p) => p.categoryName === filter);
+  const filtered = filter === "__all__" ? projects : projects.filter((p) => p.categoryName === filter);
 
   return (
     <SiteLayout>
       <PageHeader
-        eyebrow="Nos réalisations"
-        title={<>RÉALISATIONS <span className="gradient-text">Premium</span></>}
-        subtitle="Découvrez une sélection de projets sur mesure, innovants et efficaces réalisés pour nos clients."
+        eyebrow={t("hero.eyebrow")}
+        title={<>{t("hero.title1")} <span className="gradient-text">{t("hero.title2")}</span></>}
+        subtitle={t("hero.subtitle")}
         bgImage={heroPortfolio}
         bgAlt="Portfolio DODRICOM — mur de projets illuminé"
       />
@@ -73,7 +76,7 @@ function RealisationsPage() {
                   : "text-white/70 hover:bg-white/5 hover:text-white"
               }`}
             >
-              {f}
+              {f === "__all__" ? allLabel : f}
             </button>
           ))}
         </div>
@@ -102,7 +105,7 @@ function RealisationsPage() {
                 <h3 className="text-lg font-bold text-white">{p.title}</h3>
                 <p className="mt-2 line-clamp-3 text-sm text-white/70">{p.summary}</p>
                 <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80 transition group-hover:text-white">
-                  Voir le projet <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  {t("card.cta")} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </span>
               </div>
             </article>
@@ -113,11 +116,11 @@ function RealisationsPage() {
       <section className="mx-auto max-w-7xl px-5 pb-16 lg:px-8">
         <div className="glass flex flex-col items-start justify-between gap-6 p-8 lg:flex-row lg:items-center">
           <div>
-            <h3 className="text-2xl font-black text-white sm:text-3xl">Vous avez un projet ?</h3>
-            <p className="mt-2 text-white/70">Discutons ensemble de vos besoins et trouvons la meilleure solution.</p>
+            <h3 className="text-2xl font-black text-white sm:text-3xl">{t("cta.title")}</h3>
+            <p className="mt-2 text-white/70">{t("cta.body")}</p>
           </div>
           <Link to="/contact" className="btn-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold">
-            Demander un devis <ArrowRight className="h-4 w-4" />
+            {t("cta.button")} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
