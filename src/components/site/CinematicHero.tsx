@@ -205,32 +205,30 @@ export function CinematicHero() {
             <div className="max-w-2xl">
               <p className="mb-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.35em] gradient-text">
                 <Sparkles className="h-4 w-4" />
-                Bienvenue chez DODRICOM
+                {t("hero.eyebrow")}
               </p>
               <h1 className="text-[1.65rem] font-black leading-[0.95] tracking-tight text-white drop-shadow-[0_4px_30px_rgba(0,0,0,0.9)] sm:text-4xl lg:text-[3.5rem]">
-                L'innovation
+                {t("hero.title1")}
                 <br />
-                qui transforme
+                {t("hero.title2")}
                 <br />
-                <span className="gradient-text">votre entreprise</span>
+                <span className="gradient-text">{t("hero.title3")}</span>
               </h1>
               <p className="mt-5 max-w-md text-sm leading-relaxed text-white/85 sm:text-base">
-                Franchissez les portes de DODRICOM. Domotique, Digital, Réseaux, IA,
-                COM et Événementiel — un écosystème premium au service de
-                votre performance.
+                {t("hero.subtitle")}
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-4">
                 <Link
                   to="/services"
                   className="btn-gradient inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold"
                 >
-                  Découvrir <ArrowRight className="h-4 w-4" />
+                  {t("hero.cta1")} <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   to="/contact"
                   className="btn-ghost-glow inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold"
                 >
-                  Nous contacter
+                  {t("hero.cta2")}
                 </Link>
               </div>
             </div>
@@ -244,7 +242,7 @@ export function CinematicHero() {
         >
           <MousePointer2 className="h-4 w-4 animate-bounce" />
           <span className="text-[10px] font-medium uppercase tracking-[0.4em]">
-            Scroll pour entrer
+            {t("hero.scrollHint")}
           </span>
         </motion.div>
 
@@ -255,17 +253,15 @@ export function CinematicHero() {
         >
           <div className="pointer-events-auto mx-auto w-full max-w-6xl px-5 py-16 text-center lg:px-8">
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] gradient-text">
-              Qui sommes-nous
+              {t("pres.eyebrow")}
             </p>
             <h2 className="text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Un écosystème d'expertises,
+              {t("pres.title1")}
               <br />
-              une seule <span className="gradient-text">signature</span>.
+              {t("pres.title2")} <span className="gradient-text">{t("pres.title3")}</span>.
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/80 lg:text-lg">
-              Vous êtes à l'intérieur. Ici, chaque discipline — de la domotique à l'IA —
-              travaille comme une équipe. Notre mission : transformer vos ambitions en
-              systèmes qui performent.
+              {t("pres.body")}
             </p>
 
             <div className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">

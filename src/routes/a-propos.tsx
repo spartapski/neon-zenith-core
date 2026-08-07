@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { useT } from "@/lib/site-text-context";
 import aboutReception from "@/assets/about-reception.jpg";
 
 export const Route = createFileRoute("/a-propos")({
@@ -25,21 +26,21 @@ export const Route = createFileRoute("/a-propos")({
   }),
 });
 
-const VALUES = [
-  { icon: Lightbulb, title: "Innovation", desc: "Toujours à la pointe des nouvelles technologies." },
-  { icon: ShieldCheck, title: "Fiabilité", desc: "Des solutions robustes et sécurisées." },
-  { icon: Handshake, title: "Engagement", desc: "Un partenaire de confiance à chaque étape." },
-  { icon: BarChart3, title: "Performance", desc: "Des résultats mesurables et durables." },
-];
-
-const STATS = [
-  { icon: Users, value: "120+", label: "Clients satisfaits" },
-  { icon: Briefcase, value: "250+", label: "Projets réalisés" },
-  { icon: Award, value: "5+", label: "Années d'expérience" },
-  { icon: Headphones, value: "24/7", label: "Support technique" },
-];
+const VALUE_ICONS = [Lightbulb, ShieldCheck, Handshake, BarChart3];
+const STAT_ICONS = [Users, Briefcase, Award, Headphones];
 
 function AboutPage() {
+  const t = useT("a-propos");
+  const VALUES = VALUE_ICONS.map((icon, i) => ({
+    icon,
+    title: t(`values.${i + 1}.title`),
+    desc: t(`values.${i + 1}.desc`),
+  }));
+  const STATS = STAT_ICONS.map((icon, i) => ({
+    icon,
+    value: t(`stats.${i + 1}.value`),
+    label: t(`stats.${i + 1}.label`),
+  }));
   return (
     <SiteLayout>
       {/* HERO — reception background with intro + bullets */}
@@ -55,23 +56,22 @@ function AboutPage() {
 
         <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-5 pb-48 pt-32 lg:px-8">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] gradient-text">
-            À propos de DODRICOM
+            {t("hero.eyebrow")}
           </p>
           <h1 className="text-5xl font-black leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
-            Présentation
+            {t("hero.title1")}
             <br />
-            <span className="gradient-text">Commerciale</span>
+            <span className="gradient-text">{t("hero.title2")}</span>
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-white/75 lg:text-lg">
-            DODRICOM est une entreprise innovante spécialisée dans la Domotique,
-            le Digital, les Réseaux, l'IA, la COM et l'Événementiel.
+            {t("hero.subtitle")}
           </p>
           <ul className="mt-8 grid max-w-xl gap-4">
             {[
-              { icon: Target, text: "Des solutions sur mesure adaptées à vos besoins" },
-              { icon: Shield, text: "Une approche centrée sur la qualité et la performance" },
-              { icon: Users, text: "Un accompagnement de A à Z" },
-              { icon: Headphones, text: "Une équipe d'experts passionnés à votre service" },
+              { icon: Target, text: t("bullet1") },
+              { icon: Shield, text: t("bullet2") },
+              { icon: Users, text: t("bullet3") },
+              { icon: Headphones, text: t("bullet4") },
             ].map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-3">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[color:var(--brand-violet)]/40 bg-[color:var(--brand-violet)]/10">
@@ -85,22 +85,20 @@ function AboutPage() {
           {/* Bottom trio */}
           <div className="mt-14 grid gap-4 lg:grid-cols-3">
             <div className="glass p-6">
-              <h3 className="text-lg font-bold gradient-text">Notre mission</h3>
+              <h3 className="text-lg font-bold gradient-text">{t("mission.title")}</h3>
               <p className="mt-2 text-sm text-white/75">
-                Accompagner nos clients avec des solutions intelligentes, fiables
-                et évolutives pour relever les défis d'aujourd'hui et de demain.
+                {t("mission.body")}
               </p>
               <div className="my-4 h-px bg-white/10" />
-              <h3 className="text-lg font-bold gradient-text">Notre vision</h3>
+              <h3 className="text-lg font-bold gradient-text">{t("vision.title")}</h3>
               <p className="mt-2 text-sm text-white/75">
-                Devenir un acteur de référence grâce à l'innovation, la confiance
-                et l'excellence opérationnelle.
+                {t("vision.body")}
               </p>
             </div>
 
             <div className="glass p-6">
               <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.3em] gradient-text">
-                DODRICOM en chiffres
+                {t("stats.title")}
               </p>
               <div className="grid grid-cols-2 gap-5">
                 {STATS.map(({ icon: Icon, value, label }) => (
@@ -115,7 +113,7 @@ function AboutPage() {
 
             <div className="glass p-6">
               <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.3em] gradient-text">
-                Nos valeurs
+                {t("values.title")}
               </p>
               <ul className="space-y-4">
                 {VALUES.map(({ icon: Icon, title, desc }) => (
