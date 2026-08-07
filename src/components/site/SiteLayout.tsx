@@ -1,12 +1,35 @@
 import type { ReactNode } from "react";
+import { motion } from "framer-motion";
+import { useRouterState } from "@tanstack/react-router";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { useScrollPageNav, PAGE_ORDER } from "@/lib/use-scroll-page-nav";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
+  useScrollPageNav();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const index = PAGE_ORDER.indexOf(pathname as (typeof PAGE_ORDER)[number]);
+  const next = index >= 0 ? PAGE_ORDER[index + 1] : undefined;
+
   return (
     <div className="relative min-h-screen">
       <Navbar />
-      <main className="pt-[78px] lg:pt-[90px]">{children}</main>
+      <motion.main
+        key={pathname}
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="pt-[78px] lg:pt-[90px]"
+      >
+        {children}
+      </motion.main>
+      {next && (
+        <div className="pointer-events-none flex justify-center pb-6">
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-medium text-white/60 backdrop-blur-xl">
+            Continuez à défiler pour la page suivante
+          </span>
+        </div>
+      )}
       <Footer />
     </div>
   );
