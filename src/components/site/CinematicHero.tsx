@@ -4,6 +4,7 @@ import Lenis from "lenis";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles, MousePointer2, Award, Briefcase, Headphones, Users } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useT } from "@/lib/site-text-context";
 import exteriorImg from "@/assets/scene-exterior.jpg";
 import doorsImg from "@/assets/scene-doors.jpg";
 import receptionImg from "@/assets/scene-reception-desk.jpg";
@@ -41,6 +42,7 @@ const PARTNERS = [
 export function CinematicHero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const t = useT("accueil");
 
   // Smooth scroll with Lenis
   useEffect(() => {
