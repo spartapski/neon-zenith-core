@@ -176,11 +176,42 @@ export type Database = {
           },
         ]
       }
+      content_images: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          id: string
+          image_key: string
+          page_slug: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          image_key: string
+          page_slug: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          image_key?: string
+          page_slug?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       content_texts: {
         Row: {
           created_at: string
           id: string
           page_slug: string
+          style: Json
           text_key: string
           updated_at: string
           value: string
@@ -189,6 +220,7 @@ export type Database = {
           created_at?: string
           id?: string
           page_slug: string
+          style?: Json
           text_key: string
           updated_at?: string
           value?: string
@@ -197,6 +229,7 @@ export type Database = {
           created_at?: string
           id?: string
           page_slug?: string
+          style?: Json
           text_key?: string
           updated_at?: string
           value?: string
@@ -478,6 +511,7 @@ export type Database = {
           sort_order: number
           specs: Json
           status: Database["public"]["Enums"]["content_status"]
+          stock_quantity: number
           tagline: string | null
           updated_at: string
         }
@@ -497,6 +531,7 @@ export type Database = {
           sort_order?: number
           specs?: Json
           status?: Database["public"]["Enums"]["content_status"]
+          stock_quantity?: number
           tagline?: string | null
           updated_at?: string
         }
@@ -516,6 +551,7 @@ export type Database = {
           sort_order?: number
           specs?: Json
           status?: Database["public"]["Enums"]["content_status"]
+          stock_quantity?: number
           tagline?: string | null
           updated_at?: string
         }
