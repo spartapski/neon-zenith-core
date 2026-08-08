@@ -1,13 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import type { TextStyle, Typography } from "./site-text";
 
-export type SiteTextRow = { pageSlug: string; textKey: string; value: string };
+export type SiteTextRow = { pageSlug: string; textKey: string; value: string; style: TextStyle };
+export type SiteImageRow = { pageSlug: string; imageKey: string; url: string | null };
+export type SiteContent = {
+  texts: SiteTextRow[];
+  images: SiteImageRow[];
+  typography: Partial<Typography> | null;
+};
 
-export const getSiteTexts = createServerFn({ method: "GET" }).handler(async (): Promise<SiteTextRow[]> => {
+function publicClient() {
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
   const url = process.env["SUPABASE_URL"]!;
-  const supabase = createClient<Database>(url, key, {
+  return createClient<Database>(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
     global: {
       fetch: (input, init) => {
@@ -18,7 +25,28 @@ export const getSiteTexts = createServerFn({ method: "GET" }).handler(async (): 
       },
     },
   });
+}
 
-  const { data } = await supabase.from("content_texts").select("page_slug, text_key, value");
-  return (data ?? []).map((r) => ({ pageSlug: r.page_slug, textKey: r.text_key, value: r.value }));
+export const getSiteContent = createServerFn({ method: "GET" }).handler(async (): Promise<SiteContent> => {
+  const supabase = publicClient();
+  const [textsRes, imagesRes, settingsRes] = await Promise.all([
+    supabase.from("content_texts").select("page_slug, text_key, value, style"),
+    supabase.from("content_images").select("page_slug, image_key, url"),
+    supabase.from("site_settings").select("key, value").eq("key", "typography").maybeSingle(),
+  ]);
+
+  return {
+    texts: (textsRes.data ?? []).map((r) => ({
+      pageSlug: r.page_slug,
+      textKey: r.text_key,
+      value: r.value,
+      style: (r.style ?? {}) as TextStyle,
+    })),
+    images: (imagesRes.data ?? []).map((r) => ({
+      pageSlug: r.page_slug,
+      imageKey: r.image_key,
+      url: r.url,
+    })),
+    typography: (settingsRes.data?.value ?? null) as Partial<Typography> | null,
+  };
 });
