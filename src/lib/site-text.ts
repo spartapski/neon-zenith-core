@@ -260,3 +260,70 @@ export const TEXT_PAGES: TextPage[] = [
 export const TEXT_DEFAULTS: Record<string, string> = Object.fromEntries(
   TEXT_PAGES.flatMap((p) => p.fields.map((f) => [`${p.slug}.${f.key}`, f.def])),
 );
+
+/* ---------------------------------------------------------------------- */
+/* Images éditables depuis le CMS (hors produits — gérés dans le CRM)      */
+/* ---------------------------------------------------------------------- */
+
+export type ImageField = { key: string; label: string };
+export type ImagePage = { slug: string; name: string; fields: ImageField[] };
+
+export const IMAGE_PAGES: ImagePage[] = [
+  {
+    slug: "accueil",
+    name: "Accueil",
+    fields: [
+      { key: "scene.exterior", label: "Scène 1 — extérieur du bâtiment" },
+      { key: "scene.doors", label: "Scène 2 — portes vitrées" },
+      { key: "scene.reception", label: "Scène 3 — comptoir d'accueil" },
+    ],
+  },
+  // image gérée ailleurs: { slug: "a-propos", name: "À propos", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
+  // image gérée ailleurs: { slug: "services", name: "Services", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
+  { slug: "realisations", name: "Réalisations", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
+  { slug: "saas", name: "SaaS", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
+  // image gérée ailleurs: { slug: "blog", name: "Blog", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
+  { slug: "contact", name: "Contact", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
+];
+
+/* ---------------------------------------------------------------------- */
+/* Style par texte + typographie globale                                   */
+/* ---------------------------------------------------------------------- */
+
+export type TextStyle = {
+  font?: "display" | "body" | "mono";
+  size?: string;
+  weight?: string;
+  color?: string;
+  align?: "left" | "center" | "right";
+  transform?: "none" | "uppercase" | "lowercase" | "capitalize";
+  letterSpacing?: string;
+  lineHeight?: string;
+  offsetX?: string;
+  offsetY?: string;
+  hidden?: boolean;
+};
+
+export const FONT_CHOICES = [
+  "Space Grotesk",
+  "Inter",
+  "Poppins",
+  "Manrope",
+  "Sora",
+  "Outfit",
+  "DM Sans",
+  "Playfair Display",
+  "JetBrains Mono",
+] as const;
+
+export type Typography = {
+  fontDisplay: string;
+  fontBody: string;
+  scale: number; // multiplicateur global de la taille du texte
+};
+
+export const TYPOGRAPHY_DEFAULT: Typography = {
+  fontDisplay: "Space Grotesk",
+  fontBody: "Inter",
+  scale: 1,
+};

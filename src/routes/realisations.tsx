@@ -3,7 +3,7 @@ import { useState } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
-import { useT } from "@/lib/site-text-context";
+import { useT, Txt, useCmsImage } from "@/lib/site-text-context";
 import heroPortfolio from "@/assets/hero-portfolio.jpg";
 import { getProjects } from "@/lib/content.functions";
 import { categoryImage } from "@/lib/content-images";
@@ -45,6 +45,7 @@ export const Route = createFileRoute("/realisations")({
 function RealisationsPage() {
   const { data: projects } = useSuspenseQuery(projectsQuery);
   const t = useT("realisations");
+  const headerBg = useCmsImage("realisations", "header.bg", heroPortfolio);
   const allLabel = t("filter.all");
   const [filter, setFilter] = useState("__all__");
 
@@ -58,9 +59,9 @@ function RealisationsPage() {
     <SiteLayout>
       <PageHeader
         eyebrow={t("hero.eyebrow")}
-        title={<>{t("hero.title1")} <span className="gradient-text">{t("hero.title2")}</span></>}
+        title={<><Txt page="realisations" k="hero.title1" /> <span className="gradient-text"><Txt page="realisations" k="hero.title2" /></span></>}
         subtitle={t("hero.subtitle")}
-        bgImage={heroPortfolio}
+        bgImage={headerBg}
         bgAlt="Portfolio DODRICOM — mur de projets illuminé"
       />
 
@@ -105,7 +106,7 @@ function RealisationsPage() {
                 <h3 className="text-lg font-bold text-white">{p.title}</h3>
                 <p className="mt-2 line-clamp-3 text-sm text-white/70">{p.summary}</p>
                 <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80 transition group-hover:text-white">
-                  {t("card.cta")} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  <Txt page="realisations" k="card.cta" /> <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </span>
               </div>
             </article>
@@ -116,11 +117,11 @@ function RealisationsPage() {
       <section className="mx-auto max-w-7xl px-5 pb-16 lg:px-8">
         <div className="glass flex flex-col items-start justify-between gap-6 p-8 lg:flex-row lg:items-center">
           <div>
-            <h3 className="text-2xl font-black text-white sm:text-3xl">{t("cta.title")}</h3>
-            <p className="mt-2 text-white/70">{t("cta.body")}</p>
+            <h3 className="text-2xl font-black text-white sm:text-3xl"><Txt page="realisations" k="cta.title" /></h3>
+            <p className="mt-2 text-white/70"><Txt page="realisations" k="cta.body" /></p>
           </div>
           <Link to="/contact" className="btn-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold">
-            {t("cta.button")} <ArrowRight className="h-4 w-4" />
+            <Txt page="realisations" k="cta.button" /> <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>

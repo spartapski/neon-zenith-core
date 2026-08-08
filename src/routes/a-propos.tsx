@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { useT } from "@/lib/site-text-context";
+import { useT, Txt } from "@/lib/site-text-context";
 import aboutReception from "@/assets/about-reception.jpg";
 
 export const Route = createFileRoute("/a-propos")({
@@ -56,15 +56,15 @@ function AboutPage() {
 
         <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-5 pb-48 pt-32 lg:px-8">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] gradient-text">
-            {t("hero.eyebrow")}
+            <Txt page="a-propos" k="hero.eyebrow" />
           </p>
           <h1 className="text-5xl font-black leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
-            {t("hero.title1")}
+            <Txt page="a-propos" k="hero.title1" />
             <br />
-            <span className="gradient-text">{t("hero.title2")}</span>
+            <span className="gradient-text"><Txt page="a-propos" k="hero.title2" /></span>
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-white/75 lg:text-lg">
-            {t("hero.subtitle")}
+            <Txt page="a-propos" k="hero.subtitle" />
           </p>
           <ul className="mt-8 grid max-w-xl gap-4">
             {[
@@ -85,20 +85,20 @@ function AboutPage() {
           {/* Bottom trio */}
           <div className="mt-14 grid gap-4 lg:grid-cols-3">
             <div className="glass p-6">
-              <h3 className="text-lg font-bold gradient-text">{t("mission.title")}</h3>
+              <h3 className="text-lg font-bold gradient-text"><Txt page="a-propos" k="mission.title" /></h3>
               <p className="mt-2 text-sm text-white/75">
-                {t("mission.body")}
+                <Txt page="a-propos" k="mission.body" />
               </p>
               <div className="my-4 h-px bg-white/10" />
-              <h3 className="text-lg font-bold gradient-text">{t("vision.title")}</h3>
+              <h3 className="text-lg font-bold gradient-text"><Txt page="a-propos" k="vision.title" /></h3>
               <p className="mt-2 text-sm text-white/75">
-                {t("vision.body")}
+                <Txt page="a-propos" k="vision.body" />
               </p>
             </div>
 
             <div className="glass p-6">
               <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.3em] gradient-text">
-                {t("stats.title")}
+                <Txt page="a-propos" k="stats.title" />
               </p>
               <div className="grid grid-cols-2 gap-5">
                 {STATS.map(({ icon: Icon, value, label }) => (
@@ -113,7 +113,7 @@ function AboutPage() {
 
             <div className="glass p-6">
               <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.3em] gradient-text">
-                {t("values.title")}
+                <Txt page="a-propos" k="values.title" />
               </p>
               <ul className="space-y-4">
                 {VALUES.map(({ icon: Icon, title, desc }) => (

@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { CinematicHero } from "@/components/site/CinematicHero";
-import { useT } from "@/lib/site-text-context";
+import { useT, Txt } from "@/lib/site-text-context";
 import aboutReception from "@/assets/about-reception.jpg";
 
 export const Route = createFileRoute("/")({
@@ -54,17 +54,17 @@ function HomePage() {
         <div className="mb-14 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
-              {t("services.eyebrow")}
+              <Txt page="accueil" k="services.eyebrow" />
             </p>
             <h2 className="max-w-3xl text-[2.75rem] font-black leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
-              {t("services.title")}
+              <Txt page="accueil" k="services.title" />
             </h2>
           </div>
           <Link
             to="/services"
             className="btn-ghost-glow inline-flex items-center gap-2 self-start rounded-full px-5 py-2.5 text-sm font-semibold"
           >
-            {t("services.cta")} <ArrowRight className="h-4 w-4" />
+            <Txt page="accueil" k="services.cta" /> <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
@@ -107,13 +107,13 @@ function HomePage() {
           </div>
           <div className="flex flex-col justify-center p-6 lg:p-10">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
-              {t("about.eyebrow")}
+              <Txt page="accueil" k="about.eyebrow" />
             </p>
             <h2 className="text-3xl font-black leading-[1.1] tracking-tight text-white sm:text-4xl lg:text-5xl">
-              {t("about.title")}
+              <Txt page="accueil" k="about.title" />
             </h2>
             <p className="mt-5 text-base leading-relaxed text-white/70 lg:text-lg">
-              {t("about.body")}
+              <Txt page="accueil" k="about.body" />
             </p>
             <ul className="mt-6 space-y-3 text-sm leading-relaxed text-white/80 lg:text-base">
               {[
@@ -133,7 +133,7 @@ function HomePage() {
                 to="/a-propos"
                 className="btn-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold"
               >
-                {t("about.cta")} <ArrowRight className="h-4 w-4" />
+                <Txt page="accueil" k="about.cta" /> <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -148,17 +148,17 @@ function HomePage() {
           <div className="relative flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
             <div>
               <h2 className="text-3xl font-black leading-[1.05] tracking-tight text-white sm:text-4xl lg:text-5xl">
-                {t("cta.title")}
+                <Txt page="accueil" k="cta.title" />
               </h2>
               <p className="mt-3 max-w-xl text-base leading-relaxed text-white/85 lg:text-lg">
-                {t("cta.body")}
+                <Txt page="accueil" k="cta.body" />
               </p>
             </div>
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 rounded-full bg-black px-7 py-4 text-sm font-semibold text-white shadow-2xl transition hover:bg-black/85"
             >
-              {t("cta.button")} <ArrowRight className="h-4 w-4" />
+              <Txt page="accueil" k="cta.button" /> <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
