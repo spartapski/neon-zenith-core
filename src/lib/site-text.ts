@@ -278,11 +278,11 @@ export const IMAGE_PAGES: ImagePage[] = [
       { key: "scene.reception", label: "Scène 3 — comptoir d'accueil" },
     ],
   },
-  { slug: "a-propos", name: "À propos", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
-  { slug: "services", name: "Services", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
+  // image gérée ailleurs: { slug: "a-propos", name: "À propos", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
+  // image gérée ailleurs: { slug: "services", name: "Services", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
   { slug: "realisations", name: "Réalisations", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
   { slug: "saas", name: "SaaS", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
-  { slug: "blog", name: "Blog", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
+  // image gérée ailleurs: { slug: "blog", name: "Blog", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
   { slug: "contact", name: "Contact", fields: [{ key: "header.bg", label: "Image d'en-tête" }] },
 ];
 
