@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, ArrowRight, Users, FileText, ShoppingCart, KanbanSquare, LifeBuoy, Building2 } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
-import { useT, Txt } from "@/lib/site-text-context";
+import { useT, Txt, useCmsImage } from "@/lib/site-text-context";
 import heroSaas from "@/assets/hero-saas.jpg";
 
 export const Route = createFileRoute("/saas")({
@@ -31,13 +31,14 @@ const PLANS = [
 
 function SaasPage() {
   const t = useT("saas");
+  const headerBg = useCmsImage("saas", "header.bg", heroSaas);
   return (
     <SiteLayout>
       <PageHeader
         eyebrow={t("hero.eyebrow")}
         title={<><Txt page="saas" k="hero.title1" /> <span className="gradient-text"><Txt page="saas" k="hero.title2" /></span>.</>}
         subtitle={t("hero.subtitle")}
-        bgImage={heroSaas}
+        bgImage={headerBg}
         bgAlt="Espace de travail cloud SaaS DODRICOM"
       />
 

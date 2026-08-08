@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Mail, MapPin, Phone, Clock, Facebook, Instagram, Linkedin, Youtube, ArrowRight, Check } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
-import { useT, Txt } from "@/lib/site-text-context";
+import { useT, Txt, useCmsImage } from "@/lib/site-text-context";
 import heroContact from "@/assets/hero-contact.jpg";
 
 export const Route = createFileRoute("/contact")({
@@ -18,6 +18,7 @@ export const Route = createFileRoute("/contact")({
 function ContactPage() {
   const [sent, setSent] = useState(false);
   const t = useT("contact");
+  const headerBg = useCmsImage("contact", "header.bg", heroContact);
 
   return (
     <SiteLayout>
@@ -25,7 +26,7 @@ function ContactPage() {
         eyebrow={t("hero.eyebrow")}
         title={<><Txt page="contact" k="hero.title1" /> <span className="gradient-text"><Txt page="contact" k="hero.title2" /></span>.</>}
         subtitle={t("hero.subtitle")}
-        bgImage={heroContact}
+        bgImage={headerBg}
         bgAlt="Hub de communication DODRICOM néon"
       />
 

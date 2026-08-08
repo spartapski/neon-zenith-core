@@ -4,7 +4,7 @@ import Lenis from "lenis";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles, MousePointer2, Award, Briefcase, Headphones, Users } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useT, Txt } from "@/lib/site-text-context";
+import { useT, Txt, useCmsImage } from "@/lib/site-text-context";
 import exteriorImg from "@/assets/scene-exterior.jpg";
 import doorsImg from "@/assets/scene-doors.jpg";
 import receptionImg from "@/assets/scene-reception-desk.jpg";
@@ -43,6 +43,9 @@ export function CinematicHero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const t = useT("accueil");
+  const imgExterior = useCmsImage("accueil", "scene.exterior", exteriorImg);
+  const imgDoors = useCmsImage("accueil", "scene.doors", doorsImg);
+  const imgReception = useCmsImage("accueil", "scene.reception", receptionImg);
 
   // Smooth scroll with Lenis
   useEffect(() => {
@@ -117,7 +120,7 @@ export function CinematicHero() {
           style={{ scale: exteriorScale, opacity: exteriorOpacity, filter: exteriorFilter }}
         >
           <img
-            src={exteriorImg}
+            src={imgExterior}
             alt="Siège DODRICOM la nuit"
             width={1920}
             height={1080}
@@ -142,7 +145,7 @@ export function CinematicHero() {
           style={{ scale: doorsScale, opacity: doorsOpacity }}
         >
           <img
-            src={doorsImg}
+            src={imgDoors}
             alt="Portes d'entrée en verre du siège DODRICOM"
             width={1920}
             height={1080}
@@ -187,7 +190,7 @@ export function CinematicHero() {
           style={{ scale: receptionScale, opacity: receptionOpacity }}
         >
           <img
-            src={receptionImg}
+            src={imgReception}
             alt="Comptoir de réception du siège DODRICOM"
             width={1920}
             height={1088}

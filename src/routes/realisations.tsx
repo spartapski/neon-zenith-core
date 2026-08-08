@@ -3,7 +3,7 @@ import { useState } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
-import { useT, Txt } from "@/lib/site-text-context";
+import { useT, Txt, useCmsImage } from "@/lib/site-text-context";
 import heroPortfolio from "@/assets/hero-portfolio.jpg";
 import { getProjects } from "@/lib/content.functions";
 import { categoryImage } from "@/lib/content-images";
@@ -45,6 +45,7 @@ export const Route = createFileRoute("/realisations")({
 function RealisationsPage() {
   const { data: projects } = useSuspenseQuery(projectsQuery);
   const t = useT("realisations");
+  const headerBg = useCmsImage("realisations", "header.bg", heroPortfolio);
   const allLabel = t("filter.all");
   const [filter, setFilter] = useState("__all__");
 
@@ -60,7 +61,7 @@ function RealisationsPage() {
         eyebrow={t("hero.eyebrow")}
         title={<><Txt page="realisations" k="hero.title1" /> <span className="gradient-text"><Txt page="realisations" k="hero.title2" /></span></>}
         subtitle={t("hero.subtitle")}
-        bgImage={heroPortfolio}
+        bgImage={headerBg}
         bgAlt="Portfolio DODRICOM — mur de projets illuminé"
       />
 
