@@ -19,7 +19,7 @@ import {
   Zap,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { useT } from "@/lib/site-text-context";
+import { useT, Txt } from "@/lib/site-text-context";
 import { getServicesContent } from "@/lib/content.functions";
 import { categoryImage, productImage } from "@/lib/content-images";
 
@@ -120,7 +120,7 @@ function ServicesPage() {
           <div className="grid gap-8 lg:grid-cols-[minmax(0,340px)_1fr] lg:items-start">
             <div>
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] gradient-text">
-                {t("hero.eyebrow")}
+                <Txt page="services" k="hero.eyebrow" />
               </p>
               <h1 className="text-5xl font-black uppercase leading-none text-white sm:text-6xl">
                 {category.name}
@@ -164,7 +164,7 @@ function ServicesPage() {
       {/* PRODUCTS — Apple-store style cards */}
       <section className="relative mx-auto max-w-7xl px-5 pb-10 lg:px-8">
         <div className="mb-5 flex items-end justify-between">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] gradient-text">{t("products.title")}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] gradient-text"><Txt page="services" k="products.title" /></p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => scrollBy(-1)}
@@ -185,7 +185,7 @@ function ServicesPage() {
 
         {catProducts.length === 0 ? (
           <p className="glass p-8 text-sm text-white/60">
-            {t("products.empty")}
+            <Txt page="services" k="products.empty" />
           </p>
         ) : (
           <div
@@ -226,7 +226,7 @@ function ServicesPage() {
                       to="/contact"
                       className="inline-flex items-center gap-1 text-xs font-semibold text-white/70 transition group-hover:text-white"
                     >
-                      {t("products.cta")} <ArrowRight className="h-3.5 w-3.5" />
+                      <Txt page="services" k="products.cta" /> <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
                 </div>
@@ -246,7 +246,7 @@ function ServicesPage() {
       {/* PACKS + BENEFITS */}
       <section className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
         <p className="mb-6 text-xs font-semibold uppercase tracking-[0.3em] gradient-text">
-          {t("packs.title")} {category.name.toLowerCase()}
+          <Txt page="services" k="packs.title" /> {category.name.toLowerCase()}
         </p>
         <div className="grid gap-5 lg:grid-cols-4">
           {catPacks.map((pack) => (
@@ -307,7 +307,7 @@ function ServicesPage() {
         </div>
 
         <div className="mt-14 flex flex-col items-center text-white/40">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.35em]">{t("scroll.hint")}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.35em]"><Txt page="services" k="scroll.hint" /></p>
           <ChevronDown className="mt-2 h-5 w-5 animate-bounce" />
         </div>
       </section>
