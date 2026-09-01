@@ -23,6 +23,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSaasRouteImport } from './routes/admin.saas'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
+import { Route as AdminDodriaiRouteImport } from './routes/admin.dodriai'
 import { Route as AdminCrmRouteImport } from './routes/admin.crm'
 import { Route as AdminCmsRouteImport } from './routes/admin.cms'
 import { Route as AdminBillingRouteImport } from './routes/admin.billing'
@@ -98,6 +99,11 @@ const AdminFinanceRoute = AdminFinanceRouteImport.update({
   path: '/finance',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDodriaiRoute = AdminDodriaiRouteImport.update({
+  id: '/dodriai',
+  path: '/dodriai',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCrmRoute = AdminCrmRouteImport.update({
   id: '/crm',
   path: '/crm',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/admin/billing': typeof AdminBillingRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/crm': typeof AdminCrmRoute
+  '/admin/dodriai': typeof AdminDodriaiRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/saas': typeof AdminSaasRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/admin/billing': typeof AdminBillingRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/crm': typeof AdminCrmRoute
+  '/admin/dodriai': typeof AdminDodriaiRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/saas': typeof AdminSaasRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/admin/billing': typeof AdminBillingRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/crm': typeof AdminCrmRoute
+  '/admin/dodriai': typeof AdminDodriaiRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/saas': typeof AdminSaasRoute
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/admin/billing'
     | '/admin/cms'
     | '/admin/crm'
+    | '/admin/dodriai'
     | '/admin/finance'
     | '/admin/messages'
     | '/admin/saas'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/admin/billing'
     | '/admin/cms'
     | '/admin/crm'
+    | '/admin/dodriai'
     | '/admin/finance'
     | '/admin/messages'
     | '/admin/saas'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/admin/billing'
     | '/admin/cms'
     | '/admin/crm'
+    | '/admin/dodriai'
     | '/admin/finance'
     | '/admin/messages'
     | '/admin/saas'
@@ -353,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFinanceRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/dodriai': {
+      id: '/admin/dodriai'
+      path: '/dodriai'
+      fullPath: '/admin/dodriai'
+      preLoaderRoute: typeof AdminDodriaiRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/crm': {
       id: '/admin/crm'
       path: '/crm'
@@ -389,6 +408,7 @@ interface AdminRouteChildren {
   AdminBillingRoute: typeof AdminBillingRoute
   AdminCmsRoute: typeof AdminCmsRoute
   AdminCrmRoute: typeof AdminCrmRoute
+  AdminDodriaiRoute: typeof AdminDodriaiRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminSaasRoute: typeof AdminSaasRoute
@@ -401,6 +421,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBillingRoute: AdminBillingRoute,
   AdminCmsRoute: AdminCmsRoute,
   AdminCrmRoute: AdminCrmRoute,
+  AdminDodriaiRoute: AdminDodriaiRoute,
   AdminFinanceRoute: AdminFinanceRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminSaasRoute: AdminSaasRoute,
@@ -424,3 +445,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
