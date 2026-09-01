@@ -162,7 +162,7 @@ async function runTool(
         .from("content_texts")
         .select("text_key, value, style")
         .eq("page_slug", page.slug);
-      const rows = new Map((data ?? []).map((r: any) => [r.text_key, r]));
+      const rows = new Map<string, any>((data ?? []).map((r: any) => [r.text_key as string, r]));
       return page.fields.map((f) => ({
         key: f.key,
         label: f.label,
