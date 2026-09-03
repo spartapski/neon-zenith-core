@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
   ChevronRight,
@@ -20,6 +21,26 @@ import {
   Wallet,
 } from "lucide-react";
 import { useAuth, type ModuleKey } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { ModuleIcon } from "@/components/admin/ModuleRenderer";
+
+type DynModule = { slug: string; name: string; icon: string; color: string };
+
+/** Modules créés par DodriAI (publiés). "messages" est déjà dans le menu principal. */
+function useDynamicModules(enabled: boolean) {
+  return useQuery({
+    queryKey: ["app-modules-nav"],
+    enabled,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("app_modules")
+        .select("slug, name, icon, color")
+        .eq("status", "published")
+        .order("sort_order");
+      return ((data ?? []) as DynModule[]).filter((m) => m.slug !== "messages");
+    },
+  });
+}
 
 interface NavItem {
   key: ModuleKey;
