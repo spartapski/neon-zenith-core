@@ -129,14 +129,142 @@ const TOOLS = [
       },
     },
   },
+  /* ---------------- Moteur de modules (création de fonctionnalités) ---------------- */
+  {
+    type: "function",
+    function: {
+      name: "list_modules",
+      description:
+        "Liste les modules (fonctionnalités) du Back Office créés par DodriAI, avec leur définition, ainsi que les tables existantes qu'on peut brancher.",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_module",
+      description:
+        "Crée une nouvelle fonctionnalité/module complet dans le Back Office (apparaît automatiquement dans le menu, avec tableau/kanban/cartes, formulaire, recherche, KPIs, actions, export). source_kind='table' pour brancher une table existante (ex: contact_messages pour un système de Messages), 'dynamic' pour une nouvelle structure libre de données.",
+      parameters: {
+        type: "object",
+        properties: {
+          slug: { type: "string", description: "identifiant url, ex: messages, tickets, leads" },
+          name: { type: "string" },
+          icon: { type: "string", enum: [...MODULE_ICONS] },
+          color: { type: "string", description: "couleur hex, ex #8B3DFF" },
+          description: { type: "string" },
+          source_kind: { type: "string", enum: ["dynamic", "table"] },
+          source_table: { type: "string", enum: Object.keys(LINKABLE_TABLES) },
+          definition: {
+            type: "object",
+            description:
+              "{ fields:[{key,label,type(text|textarea|richtext|number|currency|boolean|date|datetime|select|multiselect|email|phone|url|tags),required,options:[{value,label,color}],showInList,searchable,width}], statuses:[{value,label,color}], statusField, titleField, subtitleField, kpis:[{key,label,type(count|sum|avg),field,filter:{field,value},format}], actions:[{label,setStatus,href,color}], defaultSort:{field,dir}, defaultView(table|kanban|cards), allowCreate, allowDelete, emptyText }",
+            additionalProperties: true,
+          },
+          status: { type: "string", enum: ["draft", "published"] },
+        },
+        required: ["slug", "name", "definition"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "update_module",
+      description:
+        "Met à jour un module existant (nom, icône, couleur, description, définition complète ou partielle, statut). La définition fournie remplace l'ancienne : renvoie toujours la définition complète.",
+      parameters: {
+        type: "object",
+        properties: {
+          slug: { type: "string" },
+          name: { type: "string" },
+          icon: { type: "string" },
+          color: { type: "string" },
+          description: { type: "string" },
+          definition: { type: "object", additionalProperties: true },
+          status: { type: "string", enum: ["draft", "published", "archived"] },
+        },
+        required: ["slug"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_module",
+      description: "Supprime définitivement un module et ses enregistrements dynamiques.",
+      parameters: {
+        type: "object",
+        properties: { slug: { type: "string" } },
+        required: ["slug"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "list_records",
+      description: "Liste les enregistrements d'un module (max 50).",
+      parameters: {
+        type: "object",
+        properties: { slug: { type: "string" }, limit: { type: "number" } },
+        required: ["slug"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "upsert_record",
+      description:
+        "Crée (sans id) ou met à jour (avec id) un enregistrement d'un module. `data` contient les champs définis par le module.",
+      parameters: {
+        type: "object",
+        properties: {
+          slug: { type: "string" },
+          id: { type: "string" },
+          data: { type: "object", additionalProperties: true },
+          status: { type: "string" },
+        },
+        required: ["slug", "data"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_record",
+      description: "Supprime un enregistrement d'un module par id.",
+      parameters: {
+        type: "object",
+        properties: { slug: { type: "string" }, id: { type: "string" } },
+        required: ["slug", "id"],
+        additionalProperties: false,
+      },
+    },
+  },
 ] as const;
 
-const SYSTEM = `Tu es DodriAI, l'assistant d'administration du site DODRICOM (agence: domotique, digital, réseaux, IA, COM, events).
-Tu pilotes réellement le site via des outils: textes du site (CMS), styles, typographie et catalogue produits.
+const SYSTEM = `Tu es DodriAI, l'assistant d'administration et de développement du Back Office DODRICOM (agence: domotique, digital, réseaux, IA, COM, events).
+Tu pilotes réellement le site via des outils: textes du site (CMS), styles, typographie, catalogue produits, ET tu peux CRÉER DE NOUVELLES FONCTIONNALITÉS grâce au moteur de modules.
+
+Moteur de modules :
+- create_module crée une vraie fonctionnalité dans le Back Office : elle apparaît dans le menu latéral, avec vue tableau / kanban / cartes, formulaire de saisie, recherche, filtres par statut, KPIs, actions rapides et export CSV.
+- Pour "professionnaliser Messages" (ou tout système lié à des données existantes) : utilise source_kind="table" + source_table="contact_messages" avec slug "messages", des statuts (new/read/replied/archived avec couleurs), des KPIs (nouveaux, total, répondus), des actions (Répondre → href "mailto:{{email}}?subject=Re: {{subject}}", Marquer lu → setStatus "read", Archiver → setStatus "archived"), defaultView "kanban" ou "table".
+- Pour une nouvelle fonctionnalité (tickets, leads, devis, planning, RH, inventaire…) : source_kind="dynamic" avec une définition riche et réfléchie (champs pertinents, statuts, KPIs, actions).
+- Conçois toujours des modules complets et professionnels, comme le ferait un développeur senior. Publie-les (status "published") sauf demande contraire.
+- Après création, indique le lien : /admin/m/<slug>.
+
 Règles:
 - Réponds toujours dans la langue de l'utilisateur (français ou arabe).
 - Avant de modifier un texte, récupère les clés avec list_pages / get_page_texts pour ne jamais inventer une clé.
-- Applique directement les demandes claires (pas de confirmation inutile), puis résume en une ou deux phrases ce que tu as changé.
+- Avant de modifier un module, appelle list_modules pour connaître sa définition actuelle.
+- Applique directement les demandes claires (pas de confirmation inutile), puis résume en quelques phrases ce que tu as changé/créé.
 - Ne divulgue jamais de clés d'API ni de détails techniques d'infrastructure.
 - Reste concis, professionnel et orienté action.`;
 
