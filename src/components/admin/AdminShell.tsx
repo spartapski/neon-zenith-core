@@ -75,6 +75,7 @@ export function AdminShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { data: dynModules = [] } = useDynamicModules(!!user);
 
   useEffect(() => {
     if (ready && !user) navigate({ to: "/" });
@@ -150,6 +151,43 @@ export function AdminShell({
               </Link>
             );
           })}
+
+          {dynModules.length > 0 && (
+            <div className="pt-3">
+              {!collapsed && (
+                <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
+                  Modules DodriAI
+                </p>
+              )}
+              {dynModules.map((m) => {
+                const to = `/admin/m/${m.slug}`;
+                const active = pathname.startsWith(to);
+                return (
+                  <Link
+                    key={m.slug}
+                    to="/admin/m/$slug"
+                    params={{ slug: m.slug }}
+                    onClick={() => setMobileOpen(false)}
+                    className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                      active
+                        ? "bg-white/[0.06] text-white"
+                        : "text-white/60 hover:bg-white/[0.04] hover:text-white"
+                    }`}
+                  >
+                    {active && (
+                      <span
+                        aria-hidden
+                        className="absolute inset-y-1 left-0 w-[3px] rounded-full"
+                        style={{ background: m.color }}
+                      />
+                    )}
+                    <ModuleIcon name={m.icon} className="h-[18px] w-[18px] shrink-0" />
+                    {!collapsed && <span className="truncate">{m.name}</span>}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </nav>
 
         <div className="border-t border-white/5 p-3">
