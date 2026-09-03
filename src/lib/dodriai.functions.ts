@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { TEXT_PAGES, TYPOGRAPHY_DEFAULT } from "./site-text";
+import { LINKABLE_TABLES, MODULE_ICONS, normalizeDefinition, slugify } from "./modules";
 
 /* ------------------------------------------------------------------ */
 /* DodriAI — assistant qui pilote le site (CMS + produits) via l'API   */
