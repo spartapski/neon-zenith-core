@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { TEXT_PAGES, TYPOGRAPHY_DEFAULT } from "./site-text";
+import { LINKABLE_TABLES, MODULE_ICONS, normalizeDefinition, slugify } from "./modules";
 
 /* ------------------------------------------------------------------ */
 /* DodriAI — assistant qui pilote le site (CMS + produits) via l'API   */
@@ -128,14 +129,142 @@ const TOOLS = [
       },
     },
   },
+  /* ---------------- Moteur de modules (création de fonctionnalités) ---------------- */
+  {
+    type: "function",
+    function: {
+      name: "list_modules",
+      description:
+        "Liste les modules (fonctionnalités) du Back Office créés par DodriAI, avec leur définition, ainsi que les tables existantes qu'on peut brancher.",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_module",
+      description:
+        "Crée une nouvelle fonctionnalité/module complet dans le Back Office (apparaît automatiquement dans le menu, avec tableau/kanban/cartes, formulaire, recherche, KPIs, actions, export). source_kind='table' pour brancher une table existante (ex: contact_messages pour un système de Messages), 'dynamic' pour une nouvelle structure libre de données.",
+      parameters: {
+        type: "object",
+        properties: {
+          slug: { type: "string", description: "identifiant url, ex: messages, tickets, leads" },
+          name: { type: "string" },
+          icon: { type: "string", enum: [...MODULE_ICONS] },
+          color: { type: "string", description: "couleur hex, ex #8B3DFF" },
+          description: { type: "string" },
+          source_kind: { type: "string", enum: ["dynamic", "table"] },
+          source_table: { type: "string", enum: Object.keys(LINKABLE_TABLES) },
+          definition: {
+            type: "object",
+            description:
+              "{ fields:[{key,label,type(text|textarea|richtext|number|currency|boolean|date|datetime|select|multiselect|email|phone|url|tags),required,options:[{value,label,color}],showInList,searchable,width}], statuses:[{value,label,color}], statusField, titleField, subtitleField, kpis:[{key,label,type(count|sum|avg),field,filter:{field,value},format}], actions:[{label,setStatus,href,color}], defaultSort:{field,dir}, defaultView(table|kanban|cards), allowCreate, allowDelete, emptyText }",
+            additionalProperties: true,
+          },
+          status: { type: "string", enum: ["draft", "published"] },
+        },
+        required: ["slug", "name", "definition"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "update_module",
+      description:
+        "Met à jour un module existant (nom, icône, couleur, description, définition complète ou partielle, statut). La définition fournie remplace l'ancienne : renvoie toujours la définition complète.",
+      parameters: {
+        type: "object",
+        properties: {
+          slug: { type: "string" },
+          name: { type: "string" },
+          icon: { type: "string" },
+          color: { type: "string" },
+          description: { type: "string" },
+          definition: { type: "object", additionalProperties: true },
+          status: { type: "string", enum: ["draft", "published", "archived"] },
+        },
+        required: ["slug"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_module",
+      description: "Supprime définitivement un module et ses enregistrements dynamiques.",
+      parameters: {
+        type: "object",
+        properties: { slug: { type: "string" } },
+        required: ["slug"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "list_records",
+      description: "Liste les enregistrements d'un module (max 50).",
+      parameters: {
+        type: "object",
+        properties: { slug: { type: "string" }, limit: { type: "number" } },
+        required: ["slug"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "upsert_record",
+      description:
+        "Crée (sans id) ou met à jour (avec id) un enregistrement d'un module. `data` contient les champs définis par le module.",
+      parameters: {
+        type: "object",
+        properties: {
+          slug: { type: "string" },
+          id: { type: "string" },
+          data: { type: "object", additionalProperties: true },
+          status: { type: "string" },
+        },
+        required: ["slug", "data"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_record",
+      description: "Supprime un enregistrement d'un module par id.",
+      parameters: {
+        type: "object",
+        properties: { slug: { type: "string" }, id: { type: "string" } },
+        required: ["slug", "id"],
+        additionalProperties: false,
+      },
+    },
+  },
 ] as const;
 
-const SYSTEM = `Tu es DodriAI, l'assistant d'administration du site DODRICOM (agence: domotique, digital, réseaux, IA, COM, events).
-Tu pilotes réellement le site via des outils: textes du site (CMS), styles, typographie et catalogue produits.
+const SYSTEM = `Tu es DodriAI, l'assistant d'administration et de développement du Back Office DODRICOM (agence: domotique, digital, réseaux, IA, COM, events).
+Tu pilotes réellement le site via des outils: textes du site (CMS), styles, typographie, catalogue produits, ET tu peux CRÉER DE NOUVELLES FONCTIONNALITÉS grâce au moteur de modules.
+
+Moteur de modules :
+- create_module crée une vraie fonctionnalité dans le Back Office : elle apparaît dans le menu latéral, avec vue tableau / kanban / cartes, formulaire de saisie, recherche, filtres par statut, KPIs, actions rapides et export CSV.
+- Pour "professionnaliser Messages" (ou tout système lié à des données existantes) : utilise source_kind="table" + source_table="contact_messages" avec slug "messages", des statuts (new/read/replied/archived avec couleurs), des KPIs (nouveaux, total, répondus), des actions (Répondre → href "mailto:{{email}}?subject=Re: {{subject}}", Marquer lu → setStatus "read", Archiver → setStatus "archived"), defaultView "kanban" ou "table".
+- Pour une nouvelle fonctionnalité (tickets, leads, devis, planning, RH, inventaire…) : source_kind="dynamic" avec une définition riche et réfléchie (champs pertinents, statuts, KPIs, actions).
+- Conçois toujours des modules complets et professionnels, comme le ferait un développeur senior. Publie-les (status "published") sauf demande contraire.
+- Après création, indique le lien : /admin/m/<slug>.
+
 Règles:
 - Réponds toujours dans la langue de l'utilisateur (français ou arabe).
 - Avant de modifier un texte, récupère les clés avec list_pages / get_page_texts pour ne jamais inventer une clé.
-- Applique directement les demandes claires (pas de confirmation inutile), puis résume en une ou deux phrases ce que tu as changé.
+- Avant de modifier un module, appelle list_modules pour connaître sa définition actuelle.
+- Applique directement les demandes claires (pas de confirmation inutile), puis résume en quelques phrases ce que tu as changé/créé.
 - Ne divulgue jamais de clés d'API ni de détails techniques d'infrastructure.
 - Reste concis, professionnel et orienté action.`;
 
@@ -270,6 +399,149 @@ async function runTool(
       if (error) return { error: error.message };
       actions.push("Produit supprimé");
       return { ok: true };
+    }
+
+    /* ---------------- Modules ---------------- */
+    case "list_modules": {
+      const { data, error } = await supabase
+        .from("app_modules")
+        .select("id, slug, name, icon, color, description, source_kind, source_table, definition, status, sort_order")
+        .order("sort_order");
+      if (error) return { error: error.message };
+      return {
+        modules: data ?? [],
+        linkableTables: Object.entries(LINKABLE_TABLES).map(([k, v]) => ({
+          table: k,
+          label: v.label,
+          columns: v.columns,
+        })),
+      };
+    }
+
+    case "create_module": {
+      const slug = slugify(String(args["slug"] || args["name"] || ""));
+      if (!slug) return { error: "slug requis" };
+      const kind = args["source_kind"] === "table" ? "table" : "dynamic";
+      const table = kind === "table" ? args["source_table"] : null;
+      if (kind === "table" && !LINKABLE_TABLES[table]) return { error: "Table non autorisée" };
+      const { data: maxRow } = await supabase
+        .from("app_modules")
+        .select("sort_order")
+        .order("sort_order", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const { data, error } = await supabase
+        .from("app_modules")
+        .insert({
+          slug,
+          name: args["name"],
+          icon: MODULE_ICONS.includes(args["icon"]) ? args["icon"] : "Boxes",
+          color: args["color"] ?? "#8B3DFF",
+          description: args["description"] ?? null,
+          source_kind: kind,
+          source_table: table,
+          definition: normalizeDefinition(args["definition"]),
+          status: args["status"] ?? "published",
+          sort_order: (maxRow?.sort_order ?? 0) + 1,
+        })
+        .select("id, slug, name")
+        .maybeSingle();
+      if (error) return { error: error.message };
+      actions.push(`Module créé : ${data?.name ?? args["name"]} → /admin/m/${slug}`);
+      return { ok: true, module: data, url: `/admin/m/${slug}` };
+    }
+
+    case "update_module": {
+      const patch: Record<string, unknown> = {};
+      for (const k of ["name", "icon", "color", "description", "status"]) {
+        if (args[k] !== undefined) patch[k] = args[k];
+      }
+      if (args["definition"]) patch["definition"] = normalizeDefinition(args["definition"]);
+      const { data, error } = await supabase
+        .from("app_modules")
+        .update(patch)
+        .eq("slug", args["slug"])
+        .select("id, slug, name")
+        .maybeSingle();
+      if (error) return { error: error.message };
+      if (!data) return { error: "Module introuvable" };
+      actions.push(`Module mis à jour : ${data.name}`);
+      return { ok: true, module: data };
+    }
+
+    case "delete_module": {
+      const { error } = await supabase.from("app_modules").delete().eq("slug", args["slug"]);
+      if (error) return { error: error.message };
+      actions.push(`Module supprimé : ${args["slug"]}`);
+      return { ok: true };
+    }
+
+    case "list_records":
+    case "upsert_record":
+    case "delete_record": {
+      const { data: mod } = await supabase
+        .from("app_modules")
+        .select("id, slug, source_kind, source_table")
+        .eq("slug", args["slug"])
+        .maybeSingle();
+      if (!mod) return { error: "Module introuvable" };
+      const limit = Math.min(Number(args["limit"] ?? 50), 50);
+
+      if (mod.source_kind === "table") {
+        const t = mod.source_table as string;
+        if (!LINKABLE_TABLES[t]) return { error: "Table non autorisée" };
+        if (name === "list_records") {
+          const { data, error } = await supabase
+            .from(t)
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(limit);
+          return error ? { error: error.message } : data;
+        }
+        if (name === "delete_record") {
+          const { error } = await supabase.from(t).delete().eq("id", args["id"]);
+          if (error) return { error: error.message };
+          actions.push("Enregistrement supprimé");
+          return { ok: true };
+        }
+        const row = { ...(args["data"] ?? {}) } as Record<string, unknown>;
+        if (args["status"]) row["status"] = args["status"];
+        if (args["id"]) row["id"] = args["id"];
+        const { data, error } = await supabase.from(t).upsert(row).select("id").maybeSingle();
+        if (error) return { error: error.message };
+        actions.push("Enregistrement enregistré");
+        return { ok: true, record: data };
+      }
+
+      if (name === "list_records") {
+        const { data, error } = await supabase
+          .from("app_records")
+          .select("id, data, status, created_at")
+          .eq("module_id", mod.id)
+          .order("created_at", { ascending: false })
+          .limit(limit);
+        return error ? { error: error.message } : data;
+      }
+      if (name === "delete_record") {
+        const { error } = await supabase.from("app_records").delete().eq("id", args["id"]);
+        if (error) return { error: error.message };
+        actions.push("Enregistrement supprimé");
+        return { ok: true };
+      }
+      const row: Record<string, unknown> = {
+        module_id: mod.id,
+        data: args["data"] ?? {},
+        status: args["status"] ?? (args["data"]?.status ?? null),
+      };
+      if (args["id"]) row["id"] = args["id"];
+      const { data, error } = await supabase
+        .from("app_records")
+        .upsert(row, { onConflict: "id" })
+        .select("id")
+        .maybeSingle();
+      if (error) return { error: error.message };
+      actions.push("Enregistrement enregistré");
+      return { ok: true, record: data };
     }
 
     default:

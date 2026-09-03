@@ -1,20 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AdminShell, Placeholder } from "@/components/admin/AdminShell";
+import { Loader2 } from "lucide-react";
+import { AdminShell } from "@/components/admin/AdminShell";
+import { ModuleRenderer } from "@/components/admin/ModuleRenderer";
+import { ModuleNotFound, useAppModule } from "./admin.m.$slug";
 
 export const Route = createFileRoute("/admin/messages")({
-  component: () => (
-    <AdminShell title="Messages" breadcrumbs={[{ label: "Messages" }]}>
-      <Placeholder
-        description="Messagerie unifiée : contact, interne, notifications, emails."
-        bullets={[
-          "Module intégré au Back Office DODRICOM",
-          "Interface premium glassmorphism",
-          "RBAC appliqué selon le rôle utilisateur",
-          "Prêt à connecter aux données live",
-          "Export PDF / Excel",
-          "Multi-langue FR / EN / AR",
-        ]}
-      />
-    </AdminShell>
-  ),
+  component: MessagesPage,
 });
+
+function MessagesPage() {
+  const { data: mod, isLoading } = useAppModule("messages");
+  return (
+    <AdminShell title={mod?.name ?? "Messages"} breadcrumbs={[{ label: "Messages" }]}>
+      {isLoading ? (
+        <div className="flex items-center gap-2 text-white/50">
+          <Loader2 className="h-4 w-4 animate-spin" /> Chargement…
+        </div>
+      ) : mod ? (
+        <ModuleRenderer module={mod} />
+      ) : (
+        <ModuleNotFound slug="messages" />
+      )}
+    </AdminShell>
+  );
+}

@@ -28,6 +28,7 @@ import { Route as AdminCrmRouteImport } from './routes/admin.crm'
 import { Route as AdminCmsRouteImport } from './routes/admin.cms'
 import { Route as AdminBillingRouteImport } from './routes/admin.billing'
 import { Route as AdminAdministrationRouteImport } from './routes/admin.administration'
+import { Route as AdminMSlugRouteImport } from './routes/admin.m.$slug'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -124,6 +125,11 @@ const AdminAdministrationRoute = AdminAdministrationRouteImport.update({
   path: '/administration',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMSlugRoute = AdminMSlugRouteImport.update({
+  id: '/m/$slug',
+  path: '/m/$slug',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/admin/saas': typeof AdminSaasRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/m/$slug': typeof AdminMSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/admin/saas': typeof AdminSaasRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/m/$slug': typeof AdminMSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/admin/saas': typeof AdminSaasRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/m/$slug': typeof AdminMSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/admin/saas'
     | '/admin/settings'
     | '/admin/'
+    | '/admin/m/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/admin/saas'
     | '/admin/settings'
     | '/admin'
+    | '/admin/m/$slug'
   id:
     | '__root__'
     | '/'
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/admin/saas'
     | '/admin/settings'
     | '/admin/'
+    | '/admin/m/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -400,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdministrationRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/m/$slug': {
+      id: '/admin/m/$slug'
+      path: '/m/$slug'
+      fullPath: '/admin/m/$slug'
+      preLoaderRoute: typeof AdminMSlugRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
@@ -414,6 +433,7 @@ interface AdminRouteChildren {
   AdminSaasRoute: typeof AdminSaasRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminMSlugRoute: typeof AdminMSlugRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -427,6 +447,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSaasRoute: AdminSaasRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminMSlugRoute: AdminMSlugRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

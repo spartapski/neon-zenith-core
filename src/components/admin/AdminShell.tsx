@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
   ChevronRight,
@@ -20,6 +21,26 @@ import {
   Wallet,
 } from "lucide-react";
 import { useAuth, type ModuleKey } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { ModuleIcon } from "@/components/admin/ModuleRenderer";
+
+type DynModule = { slug: string; name: string; icon: string; color: string };
+
+/** Modules créés par DodriAI (publiés). "messages" est déjà dans le menu principal. */
+function useDynamicModules(enabled: boolean) {
+  return useQuery({
+    queryKey: ["app-modules-nav"],
+    enabled,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("app_modules")
+        .select("slug, name, icon, color")
+        .eq("status", "published")
+        .order("sort_order");
+      return ((data ?? []) as DynModule[]).filter((m) => m.slug !== "messages");
+    },
+  });
+}
 
 interface NavItem {
   key: ModuleKey;
@@ -54,6 +75,7 @@ export function AdminShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { data: dynModules = [] } = useDynamicModules(!!user);
 
   useEffect(() => {
     if (ready && !user) navigate({ to: "/" });
@@ -129,6 +151,43 @@ export function AdminShell({
               </Link>
             );
           })}
+
+          {dynModules.length > 0 && (
+            <div className="pt-3">
+              {!collapsed && (
+                <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
+                  Modules DodriAI
+                </p>
+              )}
+              {dynModules.map((m) => {
+                const to = `/admin/m/${m.slug}`;
+                const active = pathname.startsWith(to);
+                return (
+                  <Link
+                    key={m.slug}
+                    to="/admin/m/$slug"
+                    params={{ slug: m.slug }}
+                    onClick={() => setMobileOpen(false)}
+                    className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                      active
+                        ? "bg-white/[0.06] text-white"
+                        : "text-white/60 hover:bg-white/[0.04] hover:text-white"
+                    }`}
+                  >
+                    {active && (
+                      <span
+                        aria-hidden
+                        className="absolute inset-y-1 left-0 w-[3px] rounded-full"
+                        style={{ background: m.color }}
+                      />
+                    )}
+                    <ModuleIcon name={m.icon} className="h-[18px] w-[18px] shrink-0" />
+                    {!collapsed && <span className="truncate">{m.name}</span>}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </nav>
 
         <div className="border-t border-white/5 p-3">
