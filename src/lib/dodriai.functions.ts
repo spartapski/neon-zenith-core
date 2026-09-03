@@ -401,6 +401,149 @@ async function runTool(
       return { ok: true };
     }
 
+    /* ---------------- Modules ---------------- */
+    case "list_modules": {
+      const { data, error } = await supabase
+        .from("app_modules")
+        .select("id, slug, name, icon, color, description, source_kind, source_table, definition, status, sort_order")
+        .order("sort_order");
+      if (error) return { error: error.message };
+      return {
+        modules: data ?? [],
+        linkableTables: Object.entries(LINKABLE_TABLES).map(([k, v]) => ({
+          table: k,
+          label: v.label,
+          columns: v.columns,
+        })),
+      };
+    }
+
+    case "create_module": {
+      const slug = slugify(String(args["slug"] || args["name"] || ""));
+      if (!slug) return { error: "slug requis" };
+      const kind = args["source_kind"] === "table" ? "table" : "dynamic";
+      const table = kind === "table" ? args["source_table"] : null;
+      if (kind === "table" && !LINKABLE_TABLES[table]) return { error: "Table non autorisée" };
+      const { data: maxRow } = await supabase
+        .from("app_modules")
+        .select("sort_order")
+        .order("sort_order", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const { data, error } = await supabase
+        .from("app_modules")
+        .insert({
+          slug,
+          name: args["name"],
+          icon: MODULE_ICONS.includes(args["icon"]) ? args["icon"] : "Boxes",
+          color: args["color"] ?? "#8B3DFF",
+          description: args["description"] ?? null,
+          source_kind: kind,
+          source_table: table,
+          definition: normalizeDefinition(args["definition"]),
+          status: args["status"] ?? "published",
+          sort_order: (maxRow?.sort_order ?? 0) + 1,
+        })
+        .select("id, slug, name")
+        .maybeSingle();
+      if (error) return { error: error.message };
+      actions.push(`Module créé : ${data?.name ?? args["name"]} → /admin/m/${slug}`);
+      return { ok: true, module: data, url: `/admin/m/${slug}` };
+    }
+
+    case "update_module": {
+      const patch: Record<string, unknown> = {};
+      for (const k of ["name", "icon", "color", "description", "status"]) {
+        if (args[k] !== undefined) patch[k] = args[k];
+      }
+      if (args["definition"]) patch["definition"] = normalizeDefinition(args["definition"]);
+      const { data, error } = await supabase
+        .from("app_modules")
+        .update(patch)
+        .eq("slug", args["slug"])
+        .select("id, slug, name")
+        .maybeSingle();
+      if (error) return { error: error.message };
+      if (!data) return { error: "Module introuvable" };
+      actions.push(`Module mis à jour : ${data.name}`);
+      return { ok: true, module: data };
+    }
+
+    case "delete_module": {
+      const { error } = await supabase.from("app_modules").delete().eq("slug", args["slug"]);
+      if (error) return { error: error.message };
+      actions.push(`Module supprimé : ${args["slug"]}`);
+      return { ok: true };
+    }
+
+    case "list_records":
+    case "upsert_record":
+    case "delete_record": {
+      const { data: mod } = await supabase
+        .from("app_modules")
+        .select("id, slug, source_kind, source_table")
+        .eq("slug", args["slug"])
+        .maybeSingle();
+      if (!mod) return { error: "Module introuvable" };
+      const limit = Math.min(Number(args["limit"] ?? 50), 50);
+
+      if (mod.source_kind === "table") {
+        const t = mod.source_table as string;
+        if (!LINKABLE_TABLES[t]) return { error: "Table non autorisée" };
+        if (name === "list_records") {
+          const { data, error } = await supabase
+            .from(t)
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(limit);
+          return error ? { error: error.message } : data;
+        }
+        if (name === "delete_record") {
+          const { error } = await supabase.from(t).delete().eq("id", args["id"]);
+          if (error) return { error: error.message };
+          actions.push("Enregistrement supprimé");
+          return { ok: true };
+        }
+        const row = { ...(args["data"] ?? {}) } as Record<string, unknown>;
+        if (args["status"]) row["status"] = args["status"];
+        if (args["id"]) row["id"] = args["id"];
+        const { data, error } = await supabase.from(t).upsert(row).select("id").maybeSingle();
+        if (error) return { error: error.message };
+        actions.push("Enregistrement enregistré");
+        return { ok: true, record: data };
+      }
+
+      if (name === "list_records") {
+        const { data, error } = await supabase
+          .from("app_records")
+          .select("id, data, status, created_at")
+          .eq("module_id", mod.id)
+          .order("created_at", { ascending: false })
+          .limit(limit);
+        return error ? { error: error.message } : data;
+      }
+      if (name === "delete_record") {
+        const { error } = await supabase.from("app_records").delete().eq("id", args["id"]);
+        if (error) return { error: error.message };
+        actions.push("Enregistrement supprimé");
+        return { ok: true };
+      }
+      const row: Record<string, unknown> = {
+        module_id: mod.id,
+        data: args["data"] ?? {},
+        status: args["status"] ?? (args["data"]?.status ?? null),
+      };
+      if (args["id"]) row["id"] = args["id"];
+      const { data, error } = await supabase
+        .from("app_records")
+        .upsert(row, { onConflict: "id" })
+        .select("id")
+        .maybeSingle();
+      if (error) return { error: error.message };
+      actions.push("Enregistrement enregistré");
+      return { ok: true, record: data };
+    }
+
     default:
       return { error: "Outil inconnu" };
   }
