@@ -17,6 +17,9 @@ const SUGGESTIONS = [
   "Mets la police des titres en Sora et l'échelle à 1.05",
   "Liste les produits du pôle domotique",
   "Ajoute un produit « Caméra 4K » à 2 490 MAD, stock 12",
+  "Transforme Messages en un vrai système professionnel (kanban, KPIs, réponse rapide)",
+  "Crée un module Tickets support avec priorités et SLA",
+  "Crée un module Devis avec statuts et montant total",
 ];
 
 function DodriAiPage() {
@@ -73,7 +76,7 @@ function DodriAiPage() {
                 DODRI<span className="gradient-text">AI</span>
               </p>
               <p className="text-[11px] text-white/50">
-                Pilotage du site par IA — textes, styles, typographie, produits
+                Pilotage & développement par IA — textes, produits, nouveaux modules
               </p>
             </div>
             <span className="ml-auto flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] uppercase tracking-wider text-white/60">
@@ -203,6 +206,8 @@ function DodriAiPage() {
                 "Ajuster styles, couleurs et positions",
                 "Changer la typographie globale",
                 "Créer, modifier et supprimer des produits",
+                "Créer de nouvelles fonctionnalités (modules) dans le Back Office",
+                "Professionnaliser Messages, Tickets, Devis, Leads… avec KPIs et Kanban",
               ].map((c) => (
                 <li key={c} className="flex items-start gap-2">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--brand-violet)]" />
