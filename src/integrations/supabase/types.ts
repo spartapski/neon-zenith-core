@@ -360,6 +360,91 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_pages: {
+        Row: {
+          content_css: string
+          content_html: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          slug: string
+          status: Database["public"]["Enums"]["content_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content_css?: string
+          content_html?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          slug: string
+          status?: Database["public"]["Enums"]["content_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content_css?: string
+          content_html?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          slug?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_pages_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dodriai_prompts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          prompt: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          prompt: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          prompt?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dodriai_prompts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_assets: {
         Row: {
           alt_text: string | null
@@ -856,6 +941,51 @@ export type Database = {
           label?: string | null
           updated_at?: string
           value?: Json
+        }
+        Relationships: []
+      }
+      site_visits: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          device: string | null
+          first_path: string | null
+          id: string
+          last_path: string | null
+          last_seen_at: string
+          page_views: number
+          referrer: string | null
+          session_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          first_path?: string | null
+          id?: string
+          last_path?: string | null
+          last_seen_at?: string
+          page_views?: number
+          referrer?: string | null
+          session_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          first_path?: string | null
+          id?: string
+          last_path?: string | null
+          last_seen_at?: string
+          page_views?: number
+          referrer?: string | null
+          session_id?: string
+          user_agent?: string | null
         }
         Relationships: []
       }
