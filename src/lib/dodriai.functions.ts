@@ -1,24 +1,35 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { TEXT_PAGES, TYPOGRAPHY_DEFAULT } from "./site-text";
+import { TEXT_PAGES, TYPOGRAPHY_DEFAULT, IMAGE_PAGES } from "./site-text";
 import { LINKABLE_TABLES, MODULE_ICONS, normalizeDefinition, slugify } from "./modules";
 
 /* ------------------------------------------------------------------ */
-/* DodriAI — assistant qui pilote le site (CMS + produits) via l'API   */
+/* DodriAI — assistant qui pilote et développe le site via l'API       */
 /* ------------------------------------------------------------------ */
 
-export type DodriMessage = { role: "user" | "assistant"; content: string };
-export type DodriReply = { reply: string; actions: string[] };
+export type DodriAttachment = {
+  name: string;
+  mime: string;
+  /** data URL (images) ou texte brut (fichiers texte) */
+  data: string;
+};
+export type DodriMessage = {
+  role: "user" | "assistant";
+  content: string;
+  attachments?: DodriAttachment[];
+};
+export type DodriReply = { reply: string; actions: string[]; images?: string[] };
 
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash";
+const IMAGE_MODEL = "google/gemini-2.5-flash-image-preview";
 
 const TOOLS = [
   {
     type: "function",
     function: {
       name: "list_pages",
-      description: "Liste les pages du site et les clés de texte disponibles pour chacune.",
+      description: "Liste les pages du site, leurs clés de texte et leurs emplacements d'images.",
       parameters: { type: "object", properties: {}, additionalProperties: false },
     },
   },
@@ -80,11 +91,52 @@ const TOOLS = [
       },
     },
   },
+  /* ---------------- Images ---------------- */
+  {
+    type: "function",
+    function: {
+      name: "generate_image",
+      description:
+        "Génère une image par IA (photoréaliste, cinématique, dark premium) à partir d'un prompt en anglais détaillé, l'enregistre dans la médiathèque et peut l'appliquer directement : à un emplacement d'image d'une page (pageSlug + imageKey, voir list_pages) ou à un produit (productId). Retourne l'URL.",
+      parameters: {
+        type: "object",
+        properties: {
+          prompt: { type: "string", description: "Description détaillée en anglais" },
+          pageSlug: { type: "string" },
+          imageKey: { type: "string" },
+          productId: { type: "string" },
+          fileName: { type: "string" },
+        },
+        required: ["prompt"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "set_image",
+      description:
+        "Applique une URL d'image existante à un emplacement de page (pageSlug + imageKey) ou à un produit (productId).",
+      parameters: {
+        type: "object",
+        properties: {
+          url: { type: "string" },
+          pageSlug: { type: "string" },
+          imageKey: { type: "string" },
+          productId: { type: "string" },
+        },
+        required: ["url"],
+        additionalProperties: false,
+      },
+    },
+  },
+  /* ---------------- Produits ---------------- */
   {
     type: "function",
     function: {
       name: "list_products",
-      description: "Liste les produits (avec leur pôle/service, prix, stock, statut).",
+      description: "Liste les produits (avec leur pôle/service, prix, stock, statut, image).",
       parameters: {
         type: "object",
         properties: { categorySlug: { type: "string" } },
@@ -110,6 +162,7 @@ const TOOLS = [
           currency: { type: "string" },
           stockQuantity: { type: "number" },
           badge: { type: "string" },
+          imageUrl: { type: "string" },
           status: { type: "string", enum: ["draft", "published"] },
         },
         additionalProperties: false,
@@ -129,7 +182,7 @@ const TOOLS = [
       },
     },
   },
-  /* ---------------- Moteur de modules (création de fonctionnalités) ---------------- */
+  /* ---------------- Moteur de modules ---------------- */
   {
     type: "function",
     function: {
@@ -144,7 +197,7 @@ const TOOLS = [
     function: {
       name: "create_module",
       description:
-        "Crée une nouvelle fonctionnalité/module complet dans le Back Office (apparaît automatiquement dans le menu, avec tableau/kanban/cartes, formulaire, recherche, KPIs, actions, export). source_kind='table' pour brancher une table existante (ex: contact_messages pour un système de Messages), 'dynamic' pour une nouvelle structure libre de données.",
+        "Crée une nouvelle fonctionnalité/module complet dans le Back Office (apparaît automatiquement dans le menu, avec tableau/kanban/cartes, formulaire, recherche, KPIs, actions, export). source_kind='table' pour brancher une table existante (ex: contact_messages pour un système de Messages, site_visits pour les visiteurs), 'dynamic' pour une nouvelle structure libre de données.",
       parameters: {
         type: "object",
         properties: {
@@ -248,40 +301,282 @@ const TOOLS = [
       },
     },
   },
+  /* ---------------- Analytics ---------------- */
+  {
+    type: "function",
+    function: {
+      name: "get_visitor_stats",
+      description:
+        "Statistiques des visiteurs du site : en ligne maintenant, aujourd'hui, ce mois, total, par mois (12 derniers), par pays, par appareil, pages les plus vues.",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_dashboard_stats",
+      description:
+        "Compteurs globaux du Back Office : messages de contact (par statut), produits, projets, articles, modules, visiteurs.",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  /* ---------------- Pages / projets générés (code) ---------------- */
+  {
+    type: "function",
+    function: {
+      name: "list_custom_pages",
+      description: "Liste les pages/mini-projets créés par DodriAI (publiés sur /p/<slug>).",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "upsert_custom_page",
+      description:
+        "Crée ou met à jour une page web complète codée par DodriAI (landing page, mini-projet, formulaire, page événement, calculateur…). Fournis du HTML (corps de page, sans <html>/<head>) et du CSS. Peut inclure du JavaScript inline. La page est publiée sur /p/<slug> avec le thème sombre DODRICOM.",
+      parameters: {
+        type: "object",
+        properties: {
+          slug: { type: "string" },
+          title: { type: "string" },
+          description: { type: "string" },
+          html: { type: "string" },
+          css: { type: "string" },
+          status: { type: "string", enum: ["draft", "published", "archived"] },
+        },
+        required: ["slug", "title", "html"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_custom_page",
+      description: "Supprime une page créée par DodriAI.",
+      parameters: {
+        type: "object",
+        properties: { slug: { type: "string" } },
+        required: ["slug"],
+        additionalProperties: false,
+      },
+    },
+  },
+  /* ---------------- Raccourcis ---------------- */
+  {
+    type: "function",
+    function: {
+      name: "save_prompt_shortcut",
+      description:
+        "Enregistre un raccourci (titre court + prompt complet) dans le panneau Suggestions de DodriAI pour le réutiliser en un clic.",
+      parameters: {
+        type: "object",
+        properties: { title: { type: "string" }, prompt: { type: "string" } },
+        required: ["title", "prompt"],
+        additionalProperties: false,
+      },
+    },
+  },
 ] as const;
 
-const SYSTEM = `Tu es DodriAI, l'assistant d'administration et de développement du Back Office DODRICOM (agence: domotique, digital, réseaux, IA, COM, events).
-Tu pilotes réellement le site via des outils: textes du site (CMS), styles, typographie, catalogue produits, ET tu peux CRÉER DE NOUVELLES FONCTIONNALITÉS grâce au moteur de modules.
+const SYSTEM = `Tu es DodriAI, l'assistant d'administration ET de développement du Back Office DODRICOM (agence: domotique, digital, réseaux, IA, COM, events). Tu es l'équivalent interne de Lovable : tu construis, tu développes et tu pilotes le site.
 
-Moteur de modules :
-- create_module crée une vraie fonctionnalité dans le Back Office : elle apparaît dans le menu latéral, avec vue tableau / kanban / cartes, formulaire de saisie, recherche, filtres par statut, KPIs, actions rapides et export CSV.
-- Pour "professionnaliser Messages" (ou tout système lié à des données existantes) : utilise source_kind="table" + source_table="contact_messages" avec slug "messages", des statuts (new/read/replied/archived avec couleurs), des KPIs (nouveaux, total, répondus), des actions (Répondre → href "mailto:{{email}}?subject=Re: {{subject}}", Marquer lu → setStatus "read", Archiver → setStatus "archived"), defaultView "kanban" ou "table".
-- Pour une nouvelle fonctionnalité (tickets, leads, devis, planning, RH, inventaire…) : source_kind="dynamic" avec une définition riche et réfléchie (champs pertinents, statuts, KPIs, actions).
-- Conçois toujours des modules complets et professionnels, comme le ferait un développeur senior. Publie-les (status "published") sauf demande contraire.
-- Après création, indique le lien : /admin/m/<slug>.
+Capacités réelles (via outils) :
+1. CMS : textes, styles, typographie, images de chaque page (list_pages donne les clés de textes ET les emplacements d'images).
+2. Images : generate_image crée des visuels IA (prompts en anglais, style dark premium cinématique, néons violet/bleu) et les applique directement à une page ou un produit.
+3. Catalogue produits : création/édition/suppression, images.
+4. Moteur de modules : create_module crée une vraie fonctionnalité du Back Office (menu, tableau/kanban/cartes, formulaire, recherche, KPIs, actions, export CSV).
+   - "Professionnaliser Messages" : source_kind="table", source_table="contact_messages", slug "messages", statuts new/read/replied/archived (couleurs), KPIs (nouveaux, total, répondus), actions (Répondre → href "mailto:{{email}}?subject=Re: {{subject}}", Marquer lu → setStatus "read", Archiver → setStatus "archived"). Le formulaire Contact du site public alimente automatiquement cette table.
+   - Visiteurs : source_table="site_visits" pour un journal détaillé ; get_visitor_stats pour les chiffres (en ligne, par mois, total, pays).
+   - Nouvelle fonctionnalité (tickets, leads, devis, planning, RH, inventaire…) : source_kind="dynamic" avec définition riche.
+5. Génération de code : upsert_custom_page publie de vraies pages web codées par toi (HTML/CSS/JS) sur /p/<slug> — landing pages, formulaires, calculateurs, pages événement, mini-applications. Quand l'utilisateur demande du code à copier (composant React, SQL, script…), écris-le dans ta réponse dans un bloc \`\`\`.
+6. Analytics : get_visitor_stats, get_dashboard_stats.
+7. Raccourcis : save_prompt_shortcut enregistre un prompt fréquent sous un titre court.
 
-Règles:
+Règles :
 - Réponds toujours dans la langue de l'utilisateur (français ou arabe).
-- Avant de modifier un texte, récupère les clés avec list_pages / get_page_texts pour ne jamais inventer une clé.
-- Avant de modifier un module, appelle list_modules pour connaître sa définition actuelle.
-- Applique directement les demandes claires (pas de confirmation inutile), puis résume en quelques phrases ce que tu as changé/créé.
+- Avant de modifier un texte ou une image, récupère les clés avec list_pages / get_page_texts pour ne jamais inventer une clé.
+- Avant de modifier un module, appelle list_modules.
+- Applique directement les demandes claires (pas de confirmation inutile), puis résume en quelques phrases ce que tu as changé/créé, avec les liens utiles (/admin/m/<slug>, /p/<slug>).
+- Quand l'utilisateur joint une image, analyse-la (contenu, style, texte) et utilise-la pour guider ta réponse ou tes prompts d'images.
+- Conçois toujours des résultats complets et professionnels, comme un développeur senior.
 - Ne divulgue jamais de clés d'API ni de détails techniques d'infrastructure.
 - Reste concis, professionnel et orienté action.`;
 
-type SB = { from: (t: string) => any; rpc: (n: string, a?: unknown) => any };
+type SB = {
+  from: (t: string) => any;
+  rpc: (n: string, a?: unknown) => any;
+  storage: any;
+};
+
+type Ctx = { supabase: SB; userId: string; apiKey: string; images: string[] };
+
+/* ---------------- Helpers ---------------- */
+
+async function assignImage(supabase: SB, url: string, args: Record<string, any>, actions: string[]) {
+  if (args["pageSlug"] && args["imageKey"]) {
+    const { error } = await supabase
+      .from("content_images")
+      .upsert(
+        { page_slug: args["pageSlug"], image_key: args["imageKey"], url },
+        { onConflict: "page_slug,image_key" },
+      );
+    if (error) return { error: error.message };
+    actions.push(`Image appliquée : ${args["pageSlug"]}.${args["imageKey"]}`);
+  }
+  if (args["productId"]) {
+    const { error } = await supabase.from("products").update({ image_url: url }).eq("id", args["productId"]);
+    if (error) return { error: error.message };
+    actions.push("Image produit mise à jour");
+  }
+  return null;
+}
+
+async function generateImage(ctx: Ctx, args: Record<string, any>, actions: string[]) {
+  const res = await fetch(GATEWAY, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${ctx.apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: IMAGE_MODEL,
+      messages: [
+        {
+          role: "user",
+          content: `${args["prompt"]}. Ultra realistic, cinematic lighting, dark premium atmosphere, violet and blue neon accents, 8k, no text, no watermark.`,
+        },
+      ],
+      modalities: ["image", "text"],
+    }),
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    console.error("DodriAI image error", res.status, t);
+    return { error: res.status === 402 ? "Crédits IA épuisés" : "Génération d'image indisponible" };
+  }
+  const json: any = await res.json();
+  const dataUrl: string | undefined = json.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+  if (!dataUrl) return { error: "Aucune image renvoyée par le modèle" };
+
+  const m = /^data:(image\/[a-z+]+);base64,(.+)$/i.exec(dataUrl);
+  if (!m) return { error: "Format d'image inattendu" };
+  const mime = m[1];
+  const bytes = Uint8Array.from(atob(m[2]), (c) => c.charCodeAt(0));
+  const ext = mime.split("/")[1]?.replace("jpeg", "jpg") ?? "png";
+  const base = slugify(String(args["fileName"] ?? args["prompt"]).slice(0, 40)) || "image";
+  const path = `ai/${Date.now()}-${base}.${ext}`;
+
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const up = await supabaseAdmin.storage.from("cms").upload(path, bytes, { contentType: mime, upsert: true });
+  if (up.error) return { error: up.error.message };
+  const signed = await supabaseAdmin.storage.from("cms").createSignedUrl(path, 60 * 60 * 24 * 3650);
+  const url = signed.data?.signedUrl;
+  if (!url) return { error: signed.error?.message ?? "URL introuvable" };
+
+  await supabaseAdmin.from("media_assets").insert({
+    bucket: "cms",
+    path,
+    public_url: url,
+    file_name: `${base}.${ext}`,
+    mime_type: mime,
+    size_bytes: bytes.byteLength,
+    folder: "ai",
+    alt_text: String(args["prompt"]).slice(0, 200),
+    uploaded_by: ctx.userId,
+  });
+
+  actions.push(`Image générée : ${base}.${ext}`);
+  ctx.images.push(url);
+  const assignErr = await assignImage(ctx.supabase, url, args, actions);
+  if (assignErr) return { url, ...assignErr };
+  return { ok: true, url };
+}
+
+async function visitorStats(supabase: SB) {
+  const now = Date.now();
+  const iso = (ms: number) => new Date(ms).toISOString();
+  const monthStart = new Date();
+  monthStart.setUTCDate(1);
+  monthStart.setUTCHours(0, 0, 0, 0);
+  const dayStart = new Date();
+  dayStart.setUTCHours(0, 0, 0, 0);
+  const yearAgo = new Date();
+  yearAgo.setUTCMonth(yearAgo.getUTCMonth() - 11, 1);
+  yearAgo.setUTCHours(0, 0, 0, 0);
+
+  const count = async (col: string, since?: string) => {
+    let q = supabase.from("site_visits").select("id", { count: "exact", head: true });
+    if (since) q = q.gte(col, since);
+    const { count: c } = await q;
+    return c ?? 0;
+  };
+
+  const [online, today, month, total] = await Promise.all([
+    count("last_seen_at", iso(now - 5 * 60 * 1000)),
+    count("created_at", dayStart.toISOString()),
+    count("created_at", monthStart.toISOString()),
+    count("created_at"),
+  ]);
+
+  const { data: rows } = await supabase
+    .from("site_visits")
+    .select("created_at, country, device, first_path, last_path, page_views")
+    .gte("created_at", yearAgo.toISOString())
+    .limit(5000);
+
+  const byMonth: Record<string, number> = {};
+  const byCountry: Record<string, number> = {};
+  const byDevice: Record<string, number> = {};
+  const byPage: Record<string, number> = {};
+  let pageViews = 0;
+  for (const r of rows ?? []) {
+    const k = String(r.created_at).slice(0, 7);
+    byMonth[k] = (byMonth[k] ?? 0) + 1;
+    const c = r.country || "Inconnu";
+    byCountry[c] = (byCountry[c] ?? 0) + 1;
+    const d = r.device || "desktop";
+    byDevice[d] = (byDevice[d] ?? 0) + 1;
+    const p = r.first_path || "/";
+    byPage[p] = (byPage[p] ?? 0) + 1;
+    pageViews += Number(r.page_views ?? 1);
+  }
+  const sortTop = (o: Record<string, number>, n = 10) =>
+    Object.entries(o)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, n)
+      .map(([key, value]) => ({ key, value }));
+
+  return {
+    online,
+    today,
+    thisMonth: month,
+    total,
+    pageViewsLast12Months: pageViews,
+    byMonth: Object.entries(byMonth)
+      .sort()
+      .map(([month, visitors]) => ({ month, visitors })),
+    byCountry: sortTop(byCountry, 15),
+    byDevice: sortTop(byDevice, 5),
+    topPages: sortTop(byPage, 10),
+  };
+}
 
 async function runTool(
-  supabase: SB,
+  ctx: Ctx,
   name: string,
   args: Record<string, any>,
   actions: string[],
 ): Promise<unknown> {
+  const { supabase } = ctx;
   switch (name) {
     case "list_pages":
       return TEXT_PAGES.map((p) => ({
         pageSlug: p.slug,
         name: p.name,
         keys: p.fields.map((f) => ({ key: f.key, label: f.label, default: f.def })),
+        images: (IMAGE_PAGES.find((ip) => ip.slug === p.slug)?.images ?? []).map((i: any) => ({
+          imageKey: i.key,
+          label: i.label,
+        })),
       }));
 
     case "get_page_texts": {
@@ -334,13 +629,21 @@ async function runTool(
       return { ok: true, typography: next };
     }
 
+    case "generate_image":
+      return generateImage(ctx, args, actions);
+
+    case "set_image": {
+      const err = await assignImage(supabase, String(args["url"]), args, actions);
+      return err ?? { ok: true };
+    }
+
     case "list_products": {
       const { data: cats } = await supabase.from("service_categories").select("id, slug, name");
       const bySlug = new Map((cats ?? []).map((c: any) => [c.slug, c.id]));
       const byId = new Map((cats ?? []).map((c: any) => [c.id, c.slug]));
       let q = supabase
         .from("products")
-        .select("id, category_id, slug, name, tagline, price, currency, stock_quantity, badge, status")
+        .select("id, category_id, slug, name, tagline, price, currency, stock_quantity, badge, status, image_url")
         .order("sort_order");
       if (args["categorySlug"]) q = q.eq("category_id", bySlug.get(args["categorySlug"]) ?? "");
       const { data, error } = await q;
@@ -362,16 +665,7 @@ async function runTool(
       if (args["id"]) row["id"] = args["id"];
       if (categoryId) row["category_id"] = categoryId;
       if (args["name"]) row["name"] = args["name"];
-      row["slug"] =
-        args["slug"] ??
-        (args["name"]
-          ? String(args["name"])
-              .toLowerCase()
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .replace(/[^a-z0-9]+/g, "-")
-              .replace(/^-|-$/g, "")
-          : undefined);
+      row["slug"] = args["slug"] ?? (args["name"] ? slugify(String(args["name"])) : undefined);
       if (!row["slug"]) delete row["slug"];
       for (const [k, col] of [
         ["tagline", "tagline"],
@@ -380,6 +674,7 @@ async function runTool(
         ["currency", "currency"],
         ["stockQuantity", "stock_quantity"],
         ["badge", "badge"],
+        ["imageUrl", "image_url"],
         ["status", "status"],
       ] as const) {
         if (args[k] !== undefined) row[col] = args[k];
@@ -446,7 +741,12 @@ async function runTool(
         })
         .select("id, slug, name")
         .maybeSingle();
-      if (error) return { error: error.message };
+      if (error) {
+        if (String(error.message).includes("duplicate")) {
+          return { error: `Le module "${slug}" existe déjà : utilise update_module.` };
+        }
+        return { error: error.message };
+      }
       actions.push(`Module créé : ${data?.name ?? args["name"]} → /admin/m/${slug}`);
       return { ok: true, module: data, url: `/admin/m/${slug}` };
     }
@@ -544,43 +844,146 @@ async function runTool(
       return { ok: true, record: data };
     }
 
+    /* ---------------- Analytics ---------------- */
+    case "get_visitor_stats":
+      return visitorStats(supabase);
+
+    case "get_dashboard_stats": {
+      const c = async (t: string, filter?: [string, string]) => {
+        let q = supabase.from(t).select("id", { count: "exact", head: true });
+        if (filter) q = q.eq(filter[0], filter[1]);
+        const { count } = await q;
+        return count ?? 0;
+      };
+      const [msgNew, msgRead, msgReplied, msgArchived, products, projects, posts, modules] =
+        await Promise.all([
+          c("contact_messages", ["status", "new"]),
+          c("contact_messages", ["status", "read"]),
+          c("contact_messages", ["status", "replied"]),
+          c("contact_messages", ["status", "archived"]),
+          c("products"),
+          c("projects"),
+          c("blog_posts"),
+          c("app_modules"),
+        ]);
+      const visitors = await visitorStats(supabase);
+      return {
+        messages: { new: msgNew, read: msgRead, replied: msgReplied, archived: msgArchived },
+        products,
+        projects,
+        blogPosts: posts,
+        modules,
+        visitors: { online: visitors.online, thisMonth: visitors.thisMonth, total: visitors.total },
+      };
+    }
+
+    /* ---------------- Pages générées ---------------- */
+    case "list_custom_pages": {
+      const { data, error } = await supabase
+        .from("custom_pages")
+        .select("slug, title, description, status, updated_at")
+        .order("updated_at", { ascending: false });
+      return error ? { error: error.message } : (data ?? []).map((p: any) => ({ ...p, url: `/p/${p.slug}` }));
+    }
+
+    case "upsert_custom_page": {
+      const slug = slugify(String(args["slug"] || args["title"]));
+      if (!slug) return { error: "slug requis" };
+      const { error } = await supabase.from("custom_pages").upsert(
+        {
+          slug,
+          title: args["title"],
+          description: args["description"] ?? null,
+          content_html: String(args["html"] ?? ""),
+          content_css: String(args["css"] ?? ""),
+          status: args["status"] ?? "published",
+          created_by: ctx.userId,
+        },
+        { onConflict: "slug" },
+      );
+      if (error) return { error: error.message };
+      actions.push(`Page publiée : ${args["title"]} → /p/${slug}`);
+      return { ok: true, url: `/p/${slug}` };
+    }
+
+    case "delete_custom_page": {
+      const { error } = await supabase.from("custom_pages").delete().eq("slug", args["slug"]);
+      if (error) return { error: error.message };
+      actions.push(`Page supprimée : ${args["slug"]}`);
+      return { ok: true };
+    }
+
+    case "save_prompt_shortcut": {
+      const { error } = await supabase
+        .from("dodriai_prompts")
+        .insert({ title: args["title"], prompt: args["prompt"], created_by: ctx.userId });
+      if (error) return { error: error.message };
+      actions.push(`Raccourci enregistré : ${args["title"]}`);
+      return { ok: true };
+    }
+
     default:
       return { error: "Outil inconnu" };
   }
 }
 
+/* ---------------- Conversion des messages (pièces jointes) ---------------- */
+
+function toModelMessage(m: DodriMessage) {
+  if (m.role !== "user" || !m.attachments?.length) return { role: m.role, content: m.content };
+  const parts: any[] = [];
+  let text = m.content;
+  for (const a of m.attachments) {
+    if (a.mime.startsWith("image/") && a.data.startsWith("data:")) {
+      parts.push({ type: "image_url", image_url: { url: a.data } });
+    } else {
+      text += `\n\n--- Pièce jointe: ${a.name} (${a.mime}) ---\n${a.data.slice(0, 20000)}\n--- fin ---`;
+    }
+  }
+  parts.unshift({ type: "text", text });
+  return { role: "user", content: parts };
+}
+
+async function requireAdmin(supabase: SB, userId: string) {
+  const [{ data: isAdmin }, { data: isSuper }] = await Promise.all([
+    supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
+    supabase.rpc("has_role", { _user_id: userId, _role: "super_admin" }),
+  ]);
+  return Boolean(isAdmin || isSuper);
+}
+
+/* ---------------- Server functions ---------------- */
+
 export const dodriAiChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { messages: DodriMessage[] }) => {
     if (!input || !Array.isArray(input.messages)) throw new Error("messages requis");
-    return { messages: input.messages.slice(-20) };
+    // Les pièces jointes ne sont conservées que sur le dernier message utilisateur (poids)
+    const msgs = input.messages.slice(-20);
+    const lastUserIdx = [...msgs].reverse().findIndex((m) => m.role === "user");
+    const keepIdx = lastUserIdx === -1 ? -1 : msgs.length - 1 - lastUserIdx;
+    return {
+      messages: msgs.map((m, i) => ({
+        role: m.role,
+        content: String(m.content ?? ""),
+        attachments: i === keepIdx ? (m.attachments ?? []).slice(0, 4) : undefined,
+      })),
+    };
   })
   .handler(async ({ data, context }): Promise<DodriReply> => {
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { reply: "DodriAI n'est pas configuré (clé API manquante).", actions: [] };
 
     const supabase = context.supabase as unknown as SB;
-
-    // Autorisation : réservé aux administrateurs
-    const { data: isAdmin } = await supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    const { data: isSuper } = await supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "super_admin",
-    });
-    if (!isAdmin && !isSuper) {
+    if (!(await requireAdmin(supabase, context.userId))) {
       return { reply: "Accès refusé : DodriAI est réservé aux administrateurs.", actions: [] };
     }
 
-    const messages: any[] = [
-      { role: "system", content: SYSTEM },
-      ...data.messages.map((m) => ({ role: m.role, content: m.content })),
-    ];
+    const messages: any[] = [{ role: "system", content: SYSTEM }, ...data.messages.map(toModelMessage)];
     const actions: string[] = [];
+    const ctx: Ctx = { supabase, userId: context.userId, apiKey, images: [] };
 
-    for (let step = 0; step < 8; step++) {
+    for (let step = 0; step < 10; step++) {
       const res = await fetch(GATEWAY, {
         method: "POST",
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -604,7 +1007,7 @@ export const dodriAiChat = createServerFn({ method: "POST" })
 
       const calls = msg.tool_calls ?? [];
       if (!calls.length) {
-        return { reply: msg.content ?? "", actions };
+        return { reply: msg.content ?? "", actions, images: ctx.images };
       }
 
       for (const call of calls) {
@@ -616,7 +1019,7 @@ export const dodriAiChat = createServerFn({ method: "POST" })
         }
         let result: unknown;
         try {
-          result = await runTool(supabase, call.function?.name, parsed, actions);
+          result = await runTool(ctx, call.function?.name, parsed, actions);
         } catch (e) {
           result = { error: e instanceof Error ? e.message : String(e) };
         }
@@ -628,5 +1031,50 @@ export const dodriAiChat = createServerFn({ method: "POST" })
       }
     }
 
-    return { reply: "Traitement interrompu (trop d'étapes).", actions };
+    return { reply: "Traitement interrompu (trop d'étapes).", actions, images: ctx.images };
+  });
+
+/* ---------------- Raccourcis de prompts ---------------- */
+
+export type DodriPrompt = { id: string; title: string; prompt: string; sort_order: number };
+
+export const listDodriPrompts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<DodriPrompt[]> => {
+    const { data } = await (context.supabase as unknown as SB)
+      .from("dodriai_prompts")
+      .select("id, title, prompt, sort_order")
+      .order("sort_order")
+      .order("created_at");
+    return (data ?? []) as DodriPrompt[];
+  });
+
+export const saveDodriPrompt = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id?: string; title: string; prompt: string }) => {
+    if (!input?.title?.trim() || !input?.prompt?.trim()) throw new Error("Titre et prompt requis");
+    return { id: input.id, title: input.title.trim().slice(0, 80), prompt: input.prompt.trim() };
+  })
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as unknown as SB;
+    const row: Record<string, unknown> = { title: data.title, prompt: data.prompt, created_by: context.userId };
+    if (data.id) row["id"] = data.id;
+    const { error } = await supabase.from("dodriai_prompts").upsert(row, { onConflict: "id" });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteDodriPrompt = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => {
+    if (!input?.id) throw new Error("id requis");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    const { error } = await (context.supabase as unknown as SB)
+      .from("dodriai_prompts")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
