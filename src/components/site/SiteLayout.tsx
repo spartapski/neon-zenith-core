@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { trackVisit } from "@/lib/public.functions";
 import { motion } from "framer-motion";
 import { useRouterState } from "@tanstack/react-router";
 import { Navbar } from "./Navbar";
@@ -10,6 +11,20 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const index = PAGE_ORDER.indexOf(pathname as (typeof PAGE_ORDER)[number]);
   const next = index >= 0 ? PAGE_ORDER[index + 1] : undefined;
+
+  useEffect(() => {
+    try {
+      const key = "dodri_sid";
+      let sid = window.sessionStorage.getItem(key);
+      if (!sid) {
+        sid = (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now().toString(36)).replace(/[^a-zA-Z0-9_-]/g, "");
+        window.sessionStorage.setItem(key, sid);
+      }
+      void trackVisit({ data: { sessionId: sid, path: pathname, referrer: document.referrer || undefined } }).catch(() => {});
+    } catch {
+      /* tracking best-effort */
+    }
+  }, [pathname]);
 
   return (
     <div className="relative min-h-screen">

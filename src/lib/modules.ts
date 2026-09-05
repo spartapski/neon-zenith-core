@@ -174,6 +174,20 @@ export const LINKABLE_TABLES: Record<
       { key: "status", type: "select", label: "Statut", options: ["draft", "published", "archived"] },
     ],
   },
+  site_visits: {
+    label: "Visiteurs du site",
+    columns: [
+      { key: "session_id", type: "text", label: "Session" },
+      { key: "first_path", type: "text", label: "Page d'entrée" },
+      { key: "last_path", type: "text", label: "Dernière page" },
+      { key: "referrer", type: "url", label: "Provenance" },
+      { key: "country", type: "text", label: "Pays" },
+      { key: "city", type: "text", label: "Ville" },
+      { key: "device", type: "select", label: "Appareil", options: ["desktop", "mobile", "tablet"] },
+      { key: "page_views", type: "number", label: "Pages vues" },
+      { key: "last_seen_at", type: "datetime", label: "Dernière activité" },
+    ],
+  },
   profiles: {
     label: "Utilisateurs",
     columns: [
