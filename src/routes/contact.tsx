@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { submitContact } from "@/lib/public.functions";
 import { Mail, MapPin, Phone, Clock, Facebook, Instagram, Linkedin, Youtube, ArrowRight, Check } from "lucide-react";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
 import { useT, Txt, useCmsImage } from "@/lib/site-text-context";
@@ -17,6 +19,9 @@ export const Route = createFileRoute("/contact")({
 
 function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const send = useServerFn(submitContact);
   const t = useT("contact");
   const headerBg = useCmsImage("contact", "header.bg", heroContact);
 
@@ -93,7 +98,25 @@ function ContactPage() {
               className="glass p-8 lg:p-10"
               onSubmit={(e) => {
                 e.preventDefault();
-                setSent(true);
+                const fd = new FormData(e.currentTarget);
+                const form = e.currentTarget;
+                setErr(null);
+                setSending(true);
+                send({
+                  data: {
+                    name: String(fd.get("name") ?? ""),
+                    email: String(fd.get("email") ?? ""),
+                    phone: String(fd.get("phone") ?? ""),
+                    subject: String(fd.get("subject") ?? ""),
+                    message: String(fd.get("message") ?? ""),
+                  },
+                })
+                  .then(() => {
+                    setSent(true);
+                    form.reset();
+                  })
+                  .catch((error: unknown) => setErr(error instanceof Error ? error.message : "Erreur d'envoi"))
+                  .finally(() => setSending(false));
               }}
             >
               <div className="grid gap-5 sm:grid-cols-2">
@@ -120,9 +143,12 @@ function ContactPage() {
               </label>
 
               <div className="mt-8 flex flex-wrap items-center gap-4">
-                <button type="submit" className="btn-gradient inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold">
+                <button type="submit" disabled={sending} className="btn-gradient inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold disabled:opacity-50">
                   <Txt page="contact" k="form.submit" /> <ArrowRight className="h-4 w-4" />
                 </button>
+                {err && (
+                  <span className="rounded-full border border-rose-400/30 bg-rose-400/10 px-4 py-2 text-sm text-rose-200">{err}</span>
+                )}
                 {sent && (
                   <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-300">
                     <Check className="h-4 w-4" /> <Txt page="contact" k="form.success" />
